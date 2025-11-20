@@ -1,0 +1,226 @@
+
+#gridPeliculas {
+    min-height: 400px;
+}
+
+.pelicula-item {
+    margin-bottom: 1.5rem;
+}
+
+
+.pelicula-card {
+    position: relative;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.pelicula-card:hover {
+    transform: translateY(-10px) scale(1.05);
+    box-shadow: 0 15px 40px rgba(229, 9, 20, 0.4);
+    z-index: 10;
+}
+
+
+.pelicula-imagen {
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    aspect-ratio: 2/3; /* Proporción de poster de película */
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.pelicula-imagen img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.pelicula-card:hover .pelicula-imagen img {
+    transform: scale(1.1);
+}
+
+rlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 10px;
+    padding: 15px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.pelicula-card:hover .pelicula-overlay {
+    opacity: 1;
+}
+
+/* Botones del overlay */
+.pelicula-overlay .btn {
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.btn-info-pelicula {
+    background: rgba(255, 255, 255, 0.9);
+    color: #212529;
+}
+
+.btn-info-pelicula:hover {
+    background: white;
+    transform: scale(1.1);
+}
+
+.btn-favorito {
+    border: 2px solid white;
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.btn-favorito:hover {
+    background: rgba(229, 9, 20, 0.8);
+    border-color: #E50914;
+    transform: scale(1.1);
+}
+
+.btn-favorito.active {
+    background: #E50914;
+    border-color: #E50914;
+}
+
+.pelicula-info {
+    padding: 12px 5px;
+}
+
+.pelicula-titulo {
+    color: #ffffff;
+    font-size: 0.9rem;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 5px;
+}
+
+.pelicula-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.pelicula-meta .badge {
+    font-size: 0.7rem;
+    padding: 3px 8px;
+}
+
+
+#modalDetalles .modal-body img {
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+#modalDetalles h6 {
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 0.85rem;
+}
+
+
+#contadorPeliculas {
+    font-size: 0.9rem;
+}
+
+
+
+#noResultados .bi {
+    opacity: 0.3;
+}
+
+
+
+/* Móviles pequeños */
+@media (max-width: 576px) {
+    .pelicula-card:hover {
+        transform: translateY(-5px) scale(1.02);
+    }
+    
+    .pelicula-overlay .btn {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+    }
+    
+    .pelicula-titulo {
+        font-size: 0.8rem;
+    }
+}
+
+/* Tablets */
+@media (min-width: 768px) and (max-width: 991px) {
+    .pelicula-card:hover {
+        transform: translateY(-8px) scale(1.03);
+    }
+}
+
+/* Desktop grande */
+@media (min-width: 1400px) {
+    .pelicula-card:hover {
+        transform: translateY(-12px) scale(1.08);
+    }
+}
+
+
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.pelicula-item {
+    animation: fadeIn 0.5s ease-out;
+}
+
+/* Animar entrada escalonada */
+.pelicula-item:nth-child(1) { animation-delay: 0.05s; }
+.pelicula-item:nth-child(2) { animation-delay: 0.1s; }
+.pelicula-item:nth-child(3) { animation-delay: 0.15s; }
+.pelicula-item:nth-child(4) { animation-delay: 0.2s; }
+.pelicula-item:nth-child(5) { animation-delay: 0.25s; }
+.pelicula-item:nth-child(6) { animation-delay: 0.3s; }
+
+
+.modal-body::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-body::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+    background: rgba(229, 9, 20, 0.5);
+    border-radius: 4px;
+}
+
+.modal-body::-webkit-scrollbar-thumb:hover {
+    background: rgba(229, 9, 20, 0.7);
+}
+
