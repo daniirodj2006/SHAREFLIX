@@ -757,3 +757,21 @@ BEGIN
 END$$
 
 DELIMITER ;
+
+-- procedimiento de phpmaile
+DELIMITER $$
+DROP PROCEDURE IF EXISTS ValidarCorreo$$
+CREATE  PROCEDURE `ValidarCorreo`(
+    IN p_correo VARCHAR(100)
+)
+BEGIN
+    SELECT 
+        idUsuario AS ConsecutivoUsuario,
+        nombreUsuario AS Nombre,
+        correo AS CorreoElectronico
+    FROM usuarioBD
+    WHERE correo = p_correo
+    LIMIT 1;
+END$$
+
+DELIMITER ;

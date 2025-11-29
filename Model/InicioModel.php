@@ -105,27 +105,28 @@
 
     // CREAR TOKEN DE RECUPERACIÓN
     
-    function CrearTokenRecuperacion($idUsuario)
-    {
-        try {
-            $token = GenerarToken();
-            $fechaExpiracion = date('Y-m-d H:i:s', strtotime('+1 hour'));
+   function CrearTokenRecuperacion($idUsuario)
+{
+    try {
+        $token = GenerarToken();
+        $fechaExpiracion = date('Y-m-d H:i:s', strtotime('+1 hour'));
 
-            $consulta = "INSERT INTO recuperacionContrasena (idUsuario, token, fechaExpiracion) 
+        $consulta = "INSERT INTO recuperacioncontrasena (idUsuario, token, fechaExpiracion) 
                         VALUES ($idUsuario, '$token', '$fechaExpiracion')";
-            
-            $resultado = EjecutarSentencia($consulta);
 
-            if($resultado) {
-                return $token;
-            } else {
-                return null;
-            }
-        } catch (Exception $e) {
-            RegistrarError("Excepción en CrearTokenRecuperacion: " . $e->getMessage());
+        $resultado = EjecutarSentencia($consulta);
+
+        if ($resultado) {
+            return $token;
+        } else {
             return null;
         }
+    } catch (Exception $e) {
+        RegistrarError("Excepción en CrearTokenRecuperacion: " . $e->getMessage());
+        return null;
     }
+}
+
 
  
     // VALIDAR TOKEN DE RECUPERACIÓN

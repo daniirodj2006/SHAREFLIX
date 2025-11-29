@@ -1,95 +1,104 @@
 <?php
-    use PHPMailer\PHPMailer\PHPMailer;
-    use PHPMailer\PHPMailer\SMTP;
-    use PHPMailer\PHPMailer\Exception;
+ 
+ require_once $_SERVER['DOCUMENT_ROOT'] . '/Shareflix/Controller/PHPMailer/src/Exception.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/Shareflix/Controller/PHPMailer/src/PHPMailer.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/Shareflix/Controller/PHPMailer/src/SMTP.php';
 
-    //require $_SERVER['DOCUMENT_ROOT'] . '/Shareflix/PHPMailer/src/Exception.php';
-    //require $_SERVER['DOCUMENT_ROOT'] . '/Shareflix/PHPMailer/src/PHPMailer.php';
-    //require $_SERVER['DOCUMENT_ROOT'] . '/Shareflix/PHPMailer/src/SMTP.php';
-
+   use PHPMailer\PHPMailer\PHPMailer;
+   use PHPMailer\PHPMailer\SMTP;
+   use PHPMailer\PHPMailer\Exception;
+   
     // CARGAR TEMPLATE DE EMAIL
 
-    function CargarTemplateEmail($nombreTemplate, $variables = array())
-    {
-        $rutaTemplate = $_SERVER['DOCUMENT_ROOT'] . '/Shareflix/View/email_templates/' . $nombreTemplate . '.html';
-        
-        if(!file_exists($rutaTemplate)) {
-            return null;
-        }
-        
-        $contenido = file_get_contents($rutaTemplate);
-        
-        // Reemplazar variables
-        foreach($variables as $clave => $valor) {
-            $contenido = str_replace('{{' . $clave . '}}', $valor, $contenido);
-        }
-        
-        return $contenido;
+   
+function CargarTemplateEmail($nombreTemplate, $variables = array())
+{
+    $rutaTemplate = $_SERVER['DOCUMENT_ROOT'] . '/Shareflix/View/email_templates/' . $nombreTemplate . '.php';
+
+    if (!file_exists($rutaTemplate)) {
+        return null;
     }
+
+    $contenido = file_get_contents($rutaTemplate);
+
+    foreach ($variables as $clave => $valor) {
+        $contenido = str_replace('{{' . $clave . '}}', $valor, $contenido);
+    }
+
+    return $contenido;
+}
 
    
     // ENVIAR EMAIL CON PHPMAILER
 
     
-    function EnviarCorreo($destinatario, $asunto, $mensaje, $esHTML = true)
-    {
-        try {
-            $mail = new PHPMailer(true);
+  function EnviarCorreo($destinatario, $asunto, $mensaje)
+{
+  
 
-            // Configuración del servidor SMTP
-            $mail->SMTPDebug = 0;
-            $mail->isSMTP();
-            $mail->Host = 'smtp.gmail.com';
-            $mail->SMTPAuth = true;
-            $mail->Username = 'tu_correo@gmail.com'; 
-            $mail->Password = 'tu_contraseña_app';    
-            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-            $mail->Port = 587;
 
-            // Remitente
-            $mail->setFrom('tu_correo@gmail.com', 'Shareflix');
-            
-            // Destinatario
-            $mail->addAddress($destinatario);
+    $correoSalida = "drodriguez90518@ufide.ac.cr"; // Correo Institucional personal, por ejemplo: drodriguez90518@ufide.ac.cr
+    $contrasennaSalida = ""; // Contraseña del correo
 
-            // Contenido
-            $mail->isHTML($esHTML);
-            $mail->Subject = $asunto;
-            $mail->Body = $mensaje;
-            $mail->CharSet = 'UTF-8';
+    $mail = new PHPMailer(true);
+    $mail->CharSet = 'UTF-8';
+    $mail->Encoding = 'base64';
 
-            // Enviar
-            $mail->send();
-            return array('success' => true, 'mensaje' => 'Correo enviado exitosamente');
-        } catch (Exception $e) {
-            return array('success' => false, 'mensaje' => "Error al enviar correo: {$mail->ErrorInfo}");
-        }
+    try {
+
+        // CONFIG SMTP
+        $mail->isSMTP();
+        $mail->Host       = 'smtp.office365.com';
+        $mail->SMTPAuth   = true;
+        $mail->Username   = $correoSalida;
+        $mail->Password   = $contrasennaSalida;
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->Port       = 587;
+
+        // HEADER
+        $mail->setFrom($correoSalida, 'Shareflix');
+        $mail->addAddress($destinatario);
+
+        // CONTENIDO
+        $mail->isHTML(true);
+        $mail->Subject = $asunto;
+        $mail->Body    = $mensaje;
+
+        $mail->send();
+
+        return array('success' => true, 'mensaje' => 'Correo enviado exitosamente');
+    } catch (Exception $e) {
+
+        return array(
+            'success' => false,
+            'mensaje' => "Error al enviar correo: " . $mail->ErrorInfo
+        );
     }
-
+}
 
     // ENVIAR CORREO DE RECUPERACIÓN DE CONTRASEÑA
  
     
     function EnviarCorreoRecuperacion($destinatario, $nombreUsuario, $token)
-    {
-        $enlace = "http://localhost/Shareflix/View/Inicio/RecuperarAcceso.php?token=" . $token;
-        
-        $variables = array(
-            'NOMBRE_USUARIO' => $nombreUsuario,
-            'ENLACE_RECUPERACION' => $enlace,
-            'ANIO' => date('Y')
-        );
-        
-        $mensaje = CargarTemplateEmail('recuperacion', $variables);
-        
-        if(!$mensaje) {
-            return array('success' => false, 'mensaje' => 'Error al cargar template de email');
-        }
-        
-        $asunto = "Recuperación de Contraseña - Shareflix";
-        
-        return EnviarCorreo($destinatario, $asunto, $mensaje, true);
+{
+    $enlace = "http://localhost/Shareflix/View/Inicio/RestablecerContrasenna.php?token=" . urlencode($token);
+
+    $variables = array(
+        'NOMBRE_USUARIO' => $nombreUsuario,
+        'ENLACE_RECUPERACION' => $enlace,
+        'ANIO' => date('Y')
+    );
+
+    $mensaje = CargarTemplateEmail('recuperacion', $variables);
+
+    if (!$mensaje) {
+        return array('success' => false, 'mensaje' => 'Error al cargar template de email');
     }
+
+    return EnviarCorreo($destinatario, "Recuperación de Contraseña - Shareflix", $mensaje);
+}
+
+
 
     // ENVIAR CORREO DE BIENVENIDA
 

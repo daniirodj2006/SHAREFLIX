@@ -1,16 +1,16 @@
 <?php
-// ✅ 1. OUTPUT BUFFERING (PRIMERO DE TODO)
+
 ob_start();
 
-// ✅ 2. INICIAR SESIÓN
+
 if(session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
-// ✅ 3. Incluir el controlador
+
 include_once $_SERVER['DOCUMENT_ROOT'] . '/Shareflix/Controller/InicioController.php';
 
-// ✅ 4. Incluir el layout
+
 include_once $_SERVER['DOCUMENT_ROOT'] . '/Shareflix/View/LayoutExterno.php';
 ?>
 
@@ -100,6 +100,6 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/Shareflix/View/LayoutExterno.php';
 </html>
 
 <?php
-// ✅ 5. ENVIAR EL BUFFER AL FINAL
+
 ob_end_flush();
 ?>
