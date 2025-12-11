@@ -54,7 +54,7 @@
         }
     }
 
-    // ACTUALIZAR CONTENIDO
+    // ACTUALIZAR CONTENIDO ccccc
     function ActualizarContenido($idContenido, $titulo, $descripcion, $duracion, $imagen, $trailer, $calificacion, $fechaPublicacion)
     {
         try {
