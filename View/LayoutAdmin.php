@@ -59,7 +59,7 @@
         <aside class="sidebar">
             <div class="sidebar-logo">
                 <a href="Dashboard.php">
-                    <img src="../img/logo.png" alt="Shareflix" style="max-height: 50px;">
+                    
                     <h3 class="gradient-text" style="margin-top: 10px;">SHAREFLIX</h3>
                 </a>
             </div>
