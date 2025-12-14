@@ -165,7 +165,7 @@
                             <div class="pelicula-info">
                                 <h6 class="pelicula-titulo mb-1"><?php echo $pelicula['titulo']; ?></h6>
                                 <div class="pelicula-meta">
-                                    <span class="badge bg-shareflix me-1"><?php echo $pelicula['genero']; ?></span>
+                                    <span class="badge bg-shareflix me-1"><?php echo $pelicula['genero'] ?? 'Sin género'; ?></span>
                                     <span class="text-muted small"><?php echo $pelicula['anio']; ?></span>
                                 </div>
                                 <div class="mt-1">
