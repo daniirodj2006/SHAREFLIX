@@ -66,21 +66,7 @@
                                         </div>
                                         <div>
                                             <h5 class="mb-1"><?php echo $nombreUsuario; ?></h5>
-                                            <?php if($esGratis): ?>
-                                                <span class="badge bg-warning">
-                                                    <i class="bi bi-person me-1"></i>Usuario Gratis
-                                                </span>
-                                                <small class="text-muted d-block mt-1">
-                                                    Has usado <?php echo $totalFavoritos; ?> de <?php echo $limiteGratis; ?> favoritos
-                                                </small>
-                                            <?php else: ?>
-                                                <span class="badge bg-shareflix">
-                                                    <i class="bi bi-star-fill me-1"></i>Usuario Premium
-                                                </span>
-                                                <small class="text-muted d-block mt-1">
-                                                    Favoritos ilimitados ✨
-                                                </small>
-                                            <?php endif; ?>
+                                            
                                         </div>
                                     </div>
                                 </div>
@@ -94,42 +80,7 @@
                     </div>
                 </div>
             </div>
-
-            <!-- BARRA DE PROGRESO (solo para usuarios gratis) -->
-            <?php if($esGratis): ?>
-            <div class="row mb-4">
-                <div class="col-12">
-                    <div class="card border-0 shadow-sm">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span class="text-white">Límite de Favoritos</span>
-                                <span class="text-white"><?php echo $totalFavoritos; ?> / <?php echo $limiteGratis; ?></span>
-                            </div>
-                            <div class="progress" style="height: 20px;">
-                                <?php 
-                                $porcentaje = ($totalFavoritos / $limiteGratis) * 100;
-                                $colorBarra = $porcentaje >= 80 ? 'bg-danger' : ($porcentaje >= 60 ? 'bg-warning' : 'bg-success');
-                                ?>
-                                <div class="progress-bar <?php echo $colorBarra; ?>" 
-                                     role="progressbar" 
-                                     style="width: <?php echo $porcentaje; ?>%">
-                                    <?php echo round($porcentaje); ?>%
-                                </div>
-                            </div>
-                            
-                            <?php if($totalFavoritos >= $limiteGratis): ?>
-                            <div class="alert alert-warning mt-3 mb-0">
-                                <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                                <strong>¡Límite alcanzado!</strong> 
-                                Para agregar más favoritos, quita algunas películas o 
-                                <strong class="text-shareflix">actualiza a Premium</strong> para favoritos ilimitados.
-                            </div>
-                            <?php endif; ?>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <?php endif; ?>
+            
 
             <?php if(count($favoritos) > 0): ?>
                 <!-- GRID DE FAVORITOS -->
