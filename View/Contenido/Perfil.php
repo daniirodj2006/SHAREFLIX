@@ -201,20 +201,7 @@
                             </div>
 
                             <?php if($suscripcion != "Premium"): ?>
-                            <div class="alert alert-warning mt-4">
-                                <h6 class="mb-2">
-                                    <i class="fas fa-crown me-2"></i>¿Quieres más favoritos?
-                                </h6>
-                                <p class="mb-2">Actualiza a Premium y disfruta de:</p>
-                                <ul class="mb-3">
-                                    <li>Favoritos ilimitados</li>
-                                    <li>Contenido exclusivo</li>
-                                    <li>Sin anuncios</li>
-                                </ul>
-                                <button class="btn btn-warning">
-                                    <i class="fas fa-arrow-up me-2"></i>Actualizar a Premium
-                                </button>
-                            </div>
+                          
                             <?php endif; ?>
                         </div>
                     </div>
