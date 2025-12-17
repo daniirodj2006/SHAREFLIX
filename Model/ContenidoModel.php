@@ -29,17 +29,18 @@ function ConsultarContenidoPorId($idContenido)
     }
 }
 
-// AGREGAR CONTENIDO
-function AgregarContenido($titulo, $descripcion, $duracion, $imagen, $trailer, $calificacion, $fechaPublicacion)
+// AGREGAR CONTENIDO (ACTUALIZADO CON VIDEO)
+function AgregarContenido($titulo, $descripcion, $duracion, $imagen, $trailer, $videoArchivo, $calificacion, $fechaPublicacion)
 {
     try {
         $titulo = LimpiarEntrada($titulo);
         $descripcion = LimpiarEntrada($descripcion);
         $imagen = LimpiarEntrada($imagen);
         $trailer = LimpiarEntrada($trailer);
+        $videoArchivo = LimpiarEntrada($videoArchivo);
         $calificacion = LimpiarEntrada($calificacion);
 
-        $consulta = "CALL AgregarContenido('$titulo', '$descripcion', $duracion, '$imagen', '$trailer', '$calificacion', '$fechaPublicacion')";
+        $consulta = "CALL AgregarContenido('$titulo', '$descripcion', $duracion, '$imagen', '$trailer', '$videoArchivo', '$calificacion', '$fechaPublicacion')";
         $resultado = LlamarProcedimiento($consulta);
 
         if ($resultado && mysqli_num_rows($resultado) > 0) {
@@ -54,17 +55,18 @@ function AgregarContenido($titulo, $descripcion, $duracion, $imagen, $trailer, $
     }
 }
 
-// ACTUALIZAR CONTENIDO
-function ActualizarContenido($idContenido, $titulo, $descripcion, $duracion, $imagen, $trailer, $calificacion, $fechaPublicacion)
+// ACTUALIZAR CONTENIDO (ACTUALIZADO CON VIDEO)
+function ActualizarContenido($idContenido, $titulo, $descripcion, $duracion, $imagen, $trailer, $videoArchivo, $calificacion, $fechaPublicacion)
 {
     try {
         $titulo = LimpiarEntrada($titulo);
         $descripcion = LimpiarEntrada($descripcion);
         $imagen = LimpiarEntrada($imagen);
         $trailer = LimpiarEntrada($trailer);
+        $videoArchivo = LimpiarEntrada($videoArchivo);
         $calificacion = LimpiarEntrada($calificacion);
 
-        $consulta = "CALL ActualizarContenido($idContenido, '$titulo', '$descripcion', $duracion, '$imagen', '$trailer', '$calificacion', '$fechaPublicacion')";
+        $consulta = "CALL ActualizarContenido($idContenido, '$titulo', '$descripcion', $duracion, '$imagen', '$trailer', '$videoArchivo', '$calificacion', '$fechaPublicacion')";
         $resultado = LlamarProcedimiento($consulta);
 
         if ($resultado && mysqli_num_rows($resultado) > 0) {
@@ -179,6 +181,64 @@ function EliminarImagenContenido($nombreArchivo)
         return false;
     } catch (Exception $e) {
         RegistrarError("Excepción en EliminarImagenContenido: " . $e->getMessage());
+        return false;
+    }
+}
+
+// SUBIR VIDEO DE CONTENIDO (NUEVA FUNCIÓN)
+function SubirVideoContenido($archivo)
+{
+    try {
+        $directorioDestino = $_SERVER['DOCUMENT_ROOT'] . '/Shareflix/View/videos/';
+
+        // Crear directorio si no existe
+        if (!file_exists($directorioDestino)) {
+            mkdir($directorioDestino, 0777, true);
+        }
+
+        // Validar extensión de video
+        $extensionesPermitidas = array('mp4', 'webm', 'ogg');
+        $extension = strtolower(pathinfo($archivo['name'], PATHINFO_EXTENSION));
+        
+        if (!in_array($extension, $extensionesPermitidas)) {
+            return array('success' => false, 'mensaje' => 'Formato de video no permitido. Use: MP4, WEBM, OGG');
+        }
+
+        // Validar tamaño (200MB)
+        $tamanoMaximo = 200 * 1024 * 1024; // 200MB en bytes
+        if ($archivo['size'] > $tamanoMaximo) {
+            return array('success' => false, 'mensaje' => 'El video no debe superar los 200 MB');
+        }
+
+        // Generar nombre único
+        $nombreNuevo = uniqid() . '_' . time() . '.' . $extension;
+        $rutaCompleta = $directorioDestino . $nombreNuevo;
+
+        // Mover archivo
+        if (move_uploaded_file($archivo['tmp_name'], $rutaCompleta)) {
+            return array('success' => true, 'nombreArchivo' => $nombreNuevo);
+        } else {
+            return array('success' => false, 'mensaje' => 'Error al subir el video');
+        }
+    } catch (Exception $e) {
+        RegistrarError("Excepción en SubirVideoContenido: " . $e->getMessage());
+        return array('success' => false, 'mensaje' => 'Error en el servidor');
+    }
+}
+
+// ELIMINAR VIDEO DE CONTENIDO (NUEVA FUNCIÓN)
+function EliminarVideoContenido($nombreArchivo)
+{
+    try {
+        $rutaArchivo = $_SERVER['DOCUMENT_ROOT'] . '/Shareflix/View/videos/' . $nombreArchivo;
+
+        if (file_exists($rutaArchivo)) {
+            unlink($rutaArchivo);
+            return true;
+        }
+        return false;
+    } catch (Exception $e) {
+        RegistrarError("Excepción en EliminarVideoContenido: " . $e->getMessage());
         return false;
     }
 }
@@ -505,3 +565,4 @@ function ObtenerPeliculasPopulares($limite)
         return array();
     }
 }
+?>

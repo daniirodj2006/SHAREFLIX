@@ -23,10 +23,16 @@ if(isset($_POST["btnAgregarContenido"]))
     if(isset($_FILES["filePoster"]) && $_FILES["filePoster"]["error"] == 0) {
         $nombreImagen = SubirImagen($_FILES["filePoster"], 'contenido');
     }
-
+    
+    // Subir video
+    $nombreVideo = '';
+    if(isset($_FILES["fileVideo"]) && $_FILES["fileVideo"]["error"] == 0) {
+        $nombreVideo = SubirVideo($_FILES["fileVideo"]);
+    }
+    
     // Agregar contenido
-    $resultado = AgregarContenido($titulo, $descripcion, $duracion, $nombreImagen, $trailer, $calificacion, $fechaPublicacion);
-
+    $resultado = AgregarContenido($titulo, $descripcion, $duracion, $nombreImagen, $trailer, $nombreVideo, $calificacion, $fechaPublicacion);
+    
     if($resultado['success']) {
         $idContenido = $resultado['idContenido'];
         
@@ -44,11 +50,12 @@ if(isset($_POST["btnAgregarContenido"]))
             }
         }
     }
-
+    
     $_POST["Mensaje"] = $resultado['mensaje'];
     $_POST["TipoMensaje"] = $resultado['success'] ? "success" : "error";
 }
 
+// ACTUALIZAR PELÍCULA (Admin - Formulario)
 // ACTUALIZAR PELÍCULA (Admin - Formulario)
 if(isset($_POST["btnActualizarContenido"]))
 {
@@ -68,8 +75,22 @@ if(isset($_POST["btnActualizarContenido"]))
         $imagenNueva = SubirImagen($_FILES['filePoster'], 'contenido');
     }
     
+    // Manejar video (si se subió uno nuevo)
+    $videoNuevo = '';
+    if(isset($_FILES['fileVideo']) && $_FILES['fileVideo']['error'] == 0) {
+        $videoNuevo = SubirVideo($_FILES['fileVideo']);
+        
+        // Opcional: Eliminar video anterior si existe - RUTA ACTUALIZADA
+        if(!empty($_POST['videoAnterior']) && !empty($videoNuevo)) {
+            $rutaVideoAnterior = $_SERVER['DOCUMENT_ROOT'] . '/Shareflix/View/videos/' . $_POST['videoAnterior'];
+            if(file_exists($rutaVideoAnterior)) {
+                @unlink($rutaVideoAnterior);
+            }
+        }
+    }
+    
     // Actualizar contenido
-    $resultado = ActualizarContenido($idContenido, $titulo, $descripcion, $duracion, $imagenNueva, $trailer, $calificacion, $fechaPublicacion);
+    $resultado = ActualizarContenido($idContenido, $titulo, $descripcion, $duracion, $imagenNueva, $trailer, $videoNuevo, $calificacion, $fechaPublicacion);
     
     if($resultado['success']) {
         // Actualizar géneros
@@ -103,7 +124,6 @@ if(isset($_POST["btnCambiarEstadoContenido"]))
     
     $idContenido = intval($_POST["idContenido"]);
     $resultado = CambiarEstadoContenido($idContenido);
-
     $_POST["Mensaje"] = $resultado['mensaje'];
     $_POST["TipoMensaje"] = $resultado['success'] ? "success" : "error";
 }
@@ -115,7 +135,6 @@ if(isset($_POST["btnEliminarContenido"]))
     
     $idContenido = intval($_POST["idContenido"]);
     $resultado = EliminarContenido($idContenido);
-
     $_POST["Mensaje"] = $resultado['mensaje'];
     $_POST["TipoMensaje"] = $resultado['success'] ? "success" : "error";
 }
@@ -127,7 +146,6 @@ if(isset($_POST["cambiarEstadoContenidoAjax"]))
     
     $idContenido = intval($_POST["idContenido"]);
     $resultado = CambiarEstadoContenido($idContenido);
-
     header('Content-Type: application/json');
     echo json_encode($resultado);
     exit;
@@ -138,7 +156,7 @@ if(isset($_POST["consultarContenido"]))
 {
     $resultado = ConsultarContenido();
     $contenido = array();
-
+    
     if($resultado && mysqli_num_rows($resultado) > 0) {
         while($fila = mysqli_fetch_array($resultado)) {
             $contenido[] = array(
@@ -148,6 +166,7 @@ if(isset($_POST["consultarContenido"]))
                 'duracion' => $fila['Duracion'],
                 'imagen' => $fila['Imagen'],
                 'trailer' => $fila['Trailer'],
+                'videoArchivo' => isset($fila['VideoArchivo']) ? $fila['VideoArchivo'] : '',
                 'calificacionEdad' => $fila['CalificacionEdad'],
                 'fechaPublicacion' => $fila['fechaPublicacion'],
                 'activo' => $fila['Activo'],
@@ -156,7 +175,7 @@ if(isset($_POST["consultarContenido"]))
             );
         }
     }
-
+    
     header('Content-Type: application/json');
     echo json_encode(array(
         'success' => true,
@@ -170,7 +189,7 @@ if(isset($_POST["consultarContenidoPorId"]))
 {
     $idContenido = intval($_POST["idContenido"]);
     $resultado = ConsultarContenidoPorId($idContenido);
-
+    
     if($resultado && mysqli_num_rows($resultado) > 0) {
         $contenido = mysqli_fetch_array($resultado);
         
@@ -197,7 +216,7 @@ if(isset($_POST["consultarContenidoPorId"]))
                 );
             }
         }
-
+        
         header('Content-Type: application/json');
         echo json_encode(array(
             'success' => true,
@@ -208,6 +227,7 @@ if(isset($_POST["consultarContenidoPorId"]))
                 'duracion' => $contenido['Duracion'],
                 'imagen' => $contenido['Imagen'],
                 'trailer' => $contenido['Trailer'],
+                'videoArchivo' => isset($contenido['VideoArchivo']) ? $contenido['VideoArchivo'] : '',
                 'calificacionEdad' => $contenido['CalificacionEdad'],
                 'fechaPublicacion' => $contenido['fechaPublicacion'],
                 'activo' => $contenido['activo'],
@@ -231,10 +251,10 @@ if(isset($_POST["buscarContenido"]))
     $busqueda = isset($_POST["busqueda"]) ? SanitizarEntrada($_POST["busqueda"]) : '';
     $idGenero = isset($_POST["idGenero"]) ? intval($_POST["idGenero"]) : 0;
     $idCategoria = isset($_POST["idCategoria"]) ? intval($_POST["idCategoria"]) : 0;
-
+    
     $resultado = BuscarContenido($busqueda, $idGenero, $idCategoria);
     $contenido = array();
-
+    
     if($resultado && mysqli_num_rows($resultado) > 0) {
         while($fila = mysqli_fetch_array($resultado)) {
             $contenido[] = array(
@@ -243,11 +263,12 @@ if(isset($_POST["buscarContenido"]))
                 'descripcion' => $fila['Descripcion'],
                 'duracion' => $fila['Duracion'],
                 'imagen' => $fila['Imagen'],
-                'calificacionEdad' => $fila['CalificacionEdad']
+                'calificacionEdad' => $fila['CalificacionEdad'],
+                'videoArchivo' => isset($fila['VideoArchivo']) ? $fila['VideoArchivo'] : ''
             );
         }
     }
-
+    
     header('Content-Type: application/json');
     echo json_encode(array(
         'success' => true,
@@ -268,9 +289,7 @@ if(isset($_POST["btnAgregarGenero"]))
     
     $nombreGenero = SanitizarEntrada($_POST["txtNombreGenero"]);
     $descripcion = SanitizarEntrada($_POST["txtDescripcionGenero"]);
-
     $resultado = AgregarGenero($nombreGenero, $descripcion);
-
     $_POST["Mensaje"] = $resultado['mensaje'];
     $_POST["TipoMensaje"] = $resultado['success'] ? "success" : "error";
 }
@@ -283,9 +302,7 @@ if(isset($_POST["btnActualizarGenero"]))
     $idGenero = intval($_POST["idGenero"]);
     $nombreGenero = SanitizarEntrada($_POST["txtNombreGenero"]);
     $descripcion = SanitizarEntrada($_POST["txtDescripcionGenero"]);
-
     $resultado = ActualizarGenero($idGenero, $nombreGenero, $descripcion);
-
     $_POST["Mensaje"] = $resultado['mensaje'];
     $_POST["TipoMensaje"] = $resultado['success'] ? "success" : "error";
 }
@@ -297,7 +314,6 @@ if(isset($_POST["btnEliminarGenero"]))
     
     $idGenero = intval($_POST["idGenero"]);
     $resultado = EliminarGenero($idGenero);
-
     $_POST["Mensaje"] = $resultado['mensaje'];
     $_POST["TipoMensaje"] = $resultado['success'] ? "success" : "error";
 }
@@ -307,7 +323,7 @@ if(isset($_POST["consultarGeneros"]))
 {
     $resultado = ConsultarGeneros();
     $generos = array();
-
+    
     if($resultado && mysqli_num_rows($resultado) > 0) {
         while($fila = mysqli_fetch_array($resultado)) {
             $generos[] = array(
@@ -317,7 +333,7 @@ if(isset($_POST["consultarGeneros"]))
             );
         }
     }
-
+    
     header('Content-Type: application/json');
     echo json_encode(array(
         'success' => true,
@@ -333,9 +349,8 @@ if(isset($_POST["agregarGeneroAjax"]))
     
     $nombreGenero = SanitizarEntrada($_POST["nombreGenero"]);
     $descripcion = SanitizarEntrada($_POST["descripcion"]);
-
     $resultado = AgregarGenero($nombreGenero, $descripcion);
-
+    
     header('Content-Type: application/json');
     echo json_encode($resultado);
     exit;
@@ -349,9 +364,8 @@ if(isset($_POST["actualizarGeneroAjax"]))
     $idGenero = intval($_POST["idGenero"]);
     $nombreGenero = SanitizarEntrada($_POST["nombreGenero"]);
     $descripcion = SanitizarEntrada($_POST["descripcion"]);
-
     $resultado = ActualizarGenero($idGenero, $nombreGenero, $descripcion);
-
+    
     header('Content-Type: application/json');
     echo json_encode($resultado);
     exit;
@@ -364,7 +378,7 @@ if(isset($_POST["eliminarGeneroAjax"]))
     
     $idGenero = intval($_POST["idGenero"]);
     $resultado = EliminarGenero($idGenero);
-
+    
     header('Content-Type: application/json');
     echo json_encode($resultado);
     exit;
@@ -381,9 +395,7 @@ if(isset($_POST["btnAgregarCategoria"]))
     
     $nombreCategoria = SanitizarEntrada($_POST["txtNombreCategoria"]);
     $descripcion = SanitizarEntrada($_POST["txtDescripcionCategoria"]);
-
     $resultado = AgregarCategoria($nombreCategoria, $descripcion);
-
     $_POST["Mensaje"] = $resultado['mensaje'];
     $_POST["TipoMensaje"] = $resultado['success'] ? "success" : "error";
 }
@@ -396,9 +408,7 @@ if(isset($_POST["btnActualizarCategoria"]))
     $idCategoria = intval($_POST["idCategoria"]);
     $nombreCategoria = SanitizarEntrada($_POST["txtNombreCategoria"]);
     $descripcion = SanitizarEntrada($_POST["txtDescripcionCategoria"]);
-
     $resultado = ActualizarCategoria($idCategoria, $nombreCategoria, $descripcion);
-
     $_POST["Mensaje"] = $resultado['mensaje'];
     $_POST["TipoMensaje"] = $resultado['success'] ? "success" : "error";
 }
@@ -410,7 +420,6 @@ if(isset($_POST["btnEliminarCategoria"]))
     
     $idCategoria = intval($_POST["idCategoria"]);
     $resultado = EliminarCategoria($idCategoria);
-
     $_POST["Mensaje"] = $resultado['mensaje'];
     $_POST["TipoMensaje"] = $resultado['success'] ? "success" : "error";
 }
@@ -420,7 +429,7 @@ if(isset($_POST["consultarCategorias"]))
 {
     $resultado = ConsultarCategorias();
     $categorias = array();
-
+    
     if($resultado && mysqli_num_rows($resultado) > 0) {
         while($fila = mysqli_fetch_array($resultado)) {
             $categorias[] = array(
@@ -430,7 +439,7 @@ if(isset($_POST["consultarCategorias"]))
             );
         }
     }
-
+    
     header('Content-Type: application/json');
     echo json_encode(array(
         'success' => true,
@@ -446,9 +455,8 @@ if(isset($_POST["agregarCategoriaAjax"]))
     
     $nombreCategoria = SanitizarEntrada($_POST["nombreCategoria"]);
     $descripcion = SanitizarEntrada($_POST["descripcion"]);
-
     $resultado = AgregarCategoria($nombreCategoria, $descripcion);
-
+    
     header('Content-Type: application/json');
     echo json_encode($resultado);
     exit;
@@ -462,9 +470,8 @@ if(isset($_POST["actualizarCategoriaAjax"]))
     $idCategoria = intval($_POST["idCategoria"]);
     $nombreCategoria = SanitizarEntrada($_POST["nombreCategoria"]);
     $descripcion = SanitizarEntrada($_POST["descripcion"]);
-
     $resultado = ActualizarCategoria($idCategoria, $nombreCategoria, $descripcion);
-
+    
     header('Content-Type: application/json');
     echo json_encode($resultado);
     exit;
@@ -477,7 +484,7 @@ if(isset($_POST["eliminarCategoriaAjax"]))
     
     $idCategoria = intval($_POST["idCategoria"]);
     $resultado = EliminarCategoria($idCategoria);
-
+    
     header('Content-Type: application/json');
     echo json_encode($resultado);
     exit;
@@ -494,23 +501,23 @@ function SubirImagen($archivo, $carpeta = 'contenido')
         if(!isset($archivo) || $archivo['error'] !== 0) {
             return '';
         }
-
+        
         // Validar tamaño (máximo 5MB)
         $tamanoMaximo = 5 * 1024 * 1024;
         if($archivo['size'] > $tamanoMaximo) {
             return '';
         }
-
+        
         // Validar tipo de archivo
         $tiposPermitidos = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
         $finfo = finfo_open(FILEINFO_MIME_TYPE);
         $tipoMime = finfo_file($finfo, $archivo['tmp_name']);
         finfo_close($finfo);
-
+        
         if(!in_array($tipoMime, $tiposPermitidos)) {
             return '';
         }
-
+        
         // Obtener extensión
         $extension = strtolower(pathinfo($archivo['name'], PATHINFO_EXTENSION));
         
@@ -525,19 +532,76 @@ function SubirImagen($archivo, $carpeta = 'contenido')
         if(!file_exists($directorio)) {
             mkdir($directorio, 0777, true);
         }
-
+        
         // Mover archivo
         if(move_uploaded_file($archivo['tmp_name'], $rutaDestino)) {
             return $nombreArchivo;
         }
-
+        
         return '';
+        
     } catch (Exception $e) {
         RegistrarError("Error en SubirImagen: " . $e->getMessage());
         return '';
     }
 }
 
+// SUBIR VIDEO
+// SUBIR VIDEO
+function SubirVideo($archivo)
+{
+    try {
+        if(!isset($archivo) || $archivo['error'] !== 0) {
+            return '';
+        }
+        
+        // Validar tipo de archivo
+        $tiposPermitidos = ['video/mp4', 'video/webm', 'video/ogg'];
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $tipoMime = finfo_file($finfo, $archivo['tmp_name']);
+        finfo_close($finfo);
+        
+        if(!in_array($tipoMime, $tiposPermitidos)) {
+            RegistrarError("Tipo de archivo no permitido: " . $tipoMime);
+            return '';
+        }
+        
+        // Validar tamaño (máximo 200MB)
+        $tamanoMaximo = 200 * 1024 * 1024; // 200MB en bytes
+        if($archivo['size'] > $tamanoMaximo) {
+            RegistrarError("Video muy grande: " . ($archivo['size'] / 1024 / 1024) . " MB");
+            return '';
+        }
+        
+        // Obtener extensión
+        $extension = strtolower(pathinfo($archivo['name'], PATHINFO_EXTENSION));
+        
+        // Generar nombre único
+        $nombreArchivo = uniqid() . '_' . time() . '.' . $extension;
+        
+        // Ruta de destino - ACTUALIZADA A VIEW/VIDEOS
+        $directorioDestino = $_SERVER['DOCUMENT_ROOT'] . '/Shareflix/View/videos/';
+        
+        // Crear directorio si no existe
+        if(!file_exists($directorioDestino)) {
+            mkdir($directorioDestino, 0777, true);
+        }
+        
+        $rutaCompleta = $directorioDestino . $nombreArchivo;
+        
+        // Mover archivo
+        if(move_uploaded_file($archivo['tmp_name'], $rutaCompleta)) {
+            return $nombreArchivo;
+        } else {
+            RegistrarError("Error al mover el archivo de video");
+            return '';
+        }
+        
+    } catch (Exception $e) {
+        RegistrarError("Error en SubirVideo: " . $e->getMessage());
+        return '';
+    }
+}
 // ========================================
 // FUNCIONES PARA CATÁLOGO (Cliente)
 // ========================================
@@ -547,7 +611,7 @@ function ObtenerPeliculasController()
 {
     $resultado = ConsultarContenido();
     $contenido = array();
-
+    
     if($resultado && mysqli_num_rows($resultado) > 0) {
         while($fila = mysqli_fetch_array($resultado)) {
             if(isset($fila['Activo']) && $fila['Activo'] == 1) {
@@ -558,6 +622,7 @@ function ObtenerPeliculasController()
                     'duracion' => $fila['Duracion'],
                     'imagen_url' => !empty($fila['Imagen']) ? '../img/contenido/' . $fila['Imagen'] : '',
                     'trailer' => isset($fila['Trailer']) ? $fila['Trailer'] : '',
+                    'video_archivo' => isset($fila['VideoArchivo']) ? $fila['VideoArchivo'] : '',
                     'anio' => isset($fila['fechaPublicacion']) ? date('Y', strtotime($fila['fechaPublicacion'])) : date('Y'),
                     'generos' => isset($fila['Generos']) ? $fila['Generos'] : '',
                     'categorias' => isset($fila['Categorias']) ? $fila['Categorias'] : '',
@@ -566,8 +631,34 @@ function ObtenerPeliculasController()
             }
         }
     }
-
+    
     return $contenido;
+}
+
+// OBTENER PELÍCULA POR ID
+function ObtenerPeliculaPorIdController($idPelicula)
+{
+    $resultado = ConsultarContenidoPorId($idPelicula);
+    
+    if($resultado && mysqli_num_rows($resultado) > 0) {
+        $fila = mysqli_fetch_array($resultado);
+        
+        return array(
+            'ConsecutivoContenido' => $fila['ConsecutivoContenido'],
+            'Titulo' => $fila['Titulo'],
+            'Descripcion' => $fila['Descripcion'],
+            'Duracion' => $fila['Duracion'],
+            'Imagen' => $fila['Imagen'],
+            'Trailer' => isset($fila['Trailer']) ? $fila['Trailer'] : '',
+            'VideoArchivo' => isset($fila['VideoArchivo']) ? $fila['VideoArchivo'] : '',
+            'CalificacionEdad' => $fila['CalificacionEdad'],
+            'fechaPublicacion' => $fila['fechaPublicacion'],
+            'Generos' => isset($fila['Generos']) ? $fila['Generos'] : '',
+            'Categorias' => isset($fila['Categorias']) ? $fila['Categorias'] : ''
+        );
+    }
+    
+    return null;
 }
 
 // OBTENER TODOS LOS GÉNEROS
@@ -575,7 +666,7 @@ function ObtenerGenerosController()
 {
     $resultado = ConsultarGeneros();
     $generos = array();
-
+    
     if($resultado && mysqli_num_rows($resultado) > 0) {
         while($fila = mysqli_fetch_array($resultado)) {
             $generos[] = array(
@@ -584,7 +675,7 @@ function ObtenerGenerosController()
             );
         }
     }
-
+    
     return $generos;
 }
 
@@ -593,7 +684,7 @@ function ObtenerCategoriasController()
 {
     $resultado = ConsultarCategorias();
     $categorias = array();
-
+    
     if($resultado && mysqli_num_rows($resultado) > 0) {
         while($fila = mysqli_fetch_array($resultado)) {
             $categorias[] = array(
@@ -602,7 +693,7 @@ function ObtenerCategoriasController()
             );
         }
     }
-
+    
     return $categorias;
 }
 

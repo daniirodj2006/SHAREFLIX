@@ -1184,3 +1184,15 @@ body {
     line-height: 1.2;
     opacity: 0.9;
 }
+.btn-shareflix {
+    background: linear-gradient(135deg, #FF8C42, #FFA94D);
+    border: none;
+    color: white;
+    font-weight: 600;
+}
+
+.btn-shareflix:hover {
+    background: linear-gradient(135deg, #FFA94D, #FF8C42);
+    color: white;
+    transform: scale(1.05);
+}

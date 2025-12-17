@@ -121,6 +121,7 @@
                                             <th>Título</th>
                                             <th>Géneros</th>
                                             <th>Duración</th>
+                                            <th>Video</th>
                                             <th>Estado</th>
                                             <th class="text-center">Acciones</th>
                                         </tr>
@@ -168,6 +169,17 @@
                                             </td>
                                             <td class="align-middle"><?php echo $item['Duracion']; ?> min</td>
                                             <td class="align-middle">
+                                                <?php if(!empty($item['VideoArchivo'])): ?>
+                                                    <span class="badge badge-success">
+                                                        <i class="bi bi-camera-video"></i> Cargado
+                                                    </span>
+                                                <?php else: ?>
+                                                    <span class="badge" style="background: rgba(156, 163, 175, 0.2); color: #9ca3af;">
+                                                        <i class="bi bi-camera-video-off"></i> Sin video
+                                                    </span>
+                                                <?php endif; ?>
+                                            </td>
+                                            <td class="align-middle">
                                                 <?php if($item['Activo'] == 1): ?>
                                                     <span class="badge badge-success">
                                                         <i class="bi bi-check-circle"></i> Activo
@@ -185,15 +197,15 @@
                                                     <i class="bi bi-pencil"></i>
                                                 </button>
                                                 <button class="btn btn-sm btn-action-edit me-1" 
-        onclick="cambiarEstado(<?php echo $item['ConsecutivoContenido']; ?>)"
-        title="<?php echo $item['Activo'] ? 'Desactivar' : 'Activar'; ?>">
-    <i class="bi bi-power"></i>
-</button>
-<button class="btn btn-sm btn-action-delete" 
-        onclick="eliminarPelicula(<?php echo $item['ConsecutivoContenido']; ?>, '<?php echo addslashes($item['Titulo']); ?>')"
-        title="Eliminar permanentemente">
-    <i class="bi bi-trash"></i>
-</button>
+                                                        onclick="cambiarEstado(<?php echo $item['ConsecutivoContenido']; ?>)"
+                                                        title="<?php echo $item['Activo'] ? 'Desactivar' : 'Activar'; ?>">
+                                                    <i class="bi bi-power"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-action-delete" 
+                                                        onclick="eliminarPelicula(<?php echo $item['ConsecutivoContenido']; ?>, '<?php echo addslashes($item['Titulo']); ?>')"
+                                                        title="Eliminar permanentemente">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
                                             </td>
                                         </tr>
                                         <?php 
@@ -201,7 +213,7 @@
                                         else:
                                         ?>
                                         <tr>
-                                            <td colspan="7" class="text-center py-5">
+                                            <td colspan="8" class="text-center py-5">
                                                 <i class="bi bi-film" style="font-size: 3rem; color: var(--color-primary); opacity: 0.3;"></i>
                                                 <p class="text-muted mt-3">No hay contenido disponible</p>
                                                 <button class="btn btn-primary-shareflix btn-sm" data-bs-toggle="modal" 
@@ -399,7 +411,7 @@
 
     <!-- MODAL AGREGAR/EDITAR PELÍCULA -->
     <div class="modal fade" id="modalPelicula" tabindex="-1">
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog modal-xl">
             <div class="modal-content" style="background: var(--color-dark-light); border: 1px solid rgba(255, 140, 66, 0.2);">
                 <div class="modal-header" style="border-bottom: 1px solid rgba(255, 140, 66, 0.2);">
                     <h5 class="modal-title" style="color: var(--color-text);">
@@ -411,6 +423,7 @@
                     <form id="formPelicula" method="POST" enctype="multipart/form-data">
                         <input type="hidden" id="idContenido" name="idContenido">
                         <input type="hidden" id="imagenAnterior" name="imagenAnterior">
+                        <input type="hidden" id="videoAnterior" name="videoAnterior">
                         
                         <div class="row g-3">
                             <!-- Título -->
@@ -431,17 +444,17 @@
                                 <input type="number" class="form-control-shareflix" id="txtDuracion" name="txtDuracion" min="1" required>
                             </div>
 
-                     <div class="col-md-4">
-    <label class="form-label" style="color: var(--color-text-muted);">Calificación *</label>
-    <select class="form-control-shareflix" id="txtCalificacion" name="txtCalificacion" required style="color: #000;">
-        <option value="" style="color: #000;">Seleccione...</option>
-        <option value="ATP" style="color: #000;">ATP (Todo público)</option>
-        <option value="+7" style="color: #000;">+7 (Mayores de 7)</option>
-        <option value="+13" style="color: #000;">+13 (Mayores de 13)</option>
-        <option value="+16" style="color: #000;">+16 (Mayores de 16)</option>
-        <option value="+18" style="color: #000;">+18 (Adultos)</option>
-    </select>
-</div>
+                            <div class="col-md-4">
+                                <label class="form-label" style="color: var(--color-text-muted);">Calificación *</label>
+                                <select class="form-control-shareflix" id="txtCalificacion" name="txtCalificacion" required style="color: #000;">
+                                    <option value="" style="color: #000;">Seleccione...</option>
+                                    <option value="ATP" style="color: #000;">ATP (Todo público)</option>
+                                    <option value="+7" style="color: #000;">+7 (Mayores de 7)</option>
+                                    <option value="+13" style="color: #000;">+13 (Mayores de 13)</option>
+                                    <option value="+16" style="color: #000;">+16 (Mayores de 16)</option>
+                                    <option value="+18" style="color: #000;">+18 (Adultos)</option>
+                                </select>
+                            </div>
 
                             <div class="col-md-4">
                                 <label class="form-label" style="color: var(--color-text-muted);">Fecha de Publicación *</label>
@@ -489,7 +502,7 @@
                             </div>
 
                             <!-- Imagen -->
-                            <div class="col-12">
+                            <div class="col-md-6">
                                 <label class="form-label" style="color: var(--color-text-muted);">Imagen del Poster *</label>
                                 <input type="file" class="form-control-shareflix" id="filePoster" name="filePoster" 
                                        accept="image/jpeg,image/jpg,image/png,image/gif,image/webp">
@@ -497,7 +510,31 @@
                                 
                                 <!-- Preview de la imagen -->
                                 <div id="previewImagen" class="mt-3" style="display: none;">
-                                    <img id="imgPreview" src="" style="max-width: 200px; border-radius: 10px; border: 2px solid var(--color-primary);">
+                                    <img id="imgPreview" src="" style="max-width: 100%; max-height: 150px; border-radius: 10px; border: 2px solid var(--color-primary);">
+                                </div>
+                            </div>
+
+                            <!-- Video -->
+                            <div class="col-md-6">
+                                <label class="form-label" style="color: var(--color-text-muted);">
+                                    <i class="bi bi-camera-video me-2"></i>Video de la Película
+                                </label>
+                                <input type="file" class="form-control-shareflix" id="fileVideo" name="fileVideo" 
+                                       accept="video/mp4,video/webm,video/ogg">
+                                <small class="text-muted">Formatos: MP4, WEBM, OGG (Videos cortos recomendados)</small>
+                                
+                                <!-- Indicador de archivo seleccionado -->
+                                <div id="videoInfo" class="mt-3" style="display: none;">
+                                    <div class="alert alert-info py-2 px-3 mb-0" style="background: rgba(255, 140, 66, 0.1); border: 1px solid var(--color-primary); border-radius: 8px;">
+                                        <i class="bi bi-file-earmark-play me-2"></i>
+                                        <span id="videoNombre" style="color: var(--color-text);"></span>
+                                        <span id="videoTamaño" class="ms-2" style="color: var(--color-text-muted);"></span>
+                                    </div>
+                                    <div class="progress mt-2" style="height: 5px; display: none;" id="videoProgress">
+                                        <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                                             style="background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));"
+                                             role="progressbar"></div>
+                                    </div>
                                 </div>
                             </div>
 
@@ -621,30 +658,86 @@
         }
     }
 
+    function eliminarPelicula(id, titulo) {
+        if(confirm('⚠️ ¿Estás SEGURO de eliminar PERMANENTEMENTE la película "' + titulo + '"?\n\nEsta acción NO se puede deshacer y eliminará:\n- La película\n- Sus géneros\n- Sus categorías\n- De los favoritos de usuarios')) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.innerHTML = `
+                <input type="hidden" name="btnEliminarContenido" value="1">
+                <input type="hidden" name="idContenido" value="${id}">
+            `;
+            document.body.appendChild(form);
+            localStorage.setItem('activeTab', 'peliculas');
+            form.submit();
+        }
+    }
+
     function limpiarFormularioPelicula() {
         document.getElementById('formPelicula').reset();
         document.getElementById('idContenido').value = '';
         document.getElementById('imagenAnterior').value = '';
+        document.getElementById('videoAnterior').value = '';
         document.getElementById('previewImagen').style.display = 'none';
+        document.getElementById('videoInfo').style.display = 'none';
         document.getElementById('tituloModal').textContent = 'Agregar Película';
         document.getElementById('btnSubmitPelicula').innerHTML = '<i class="bi bi-save me-2"></i>Guardar Película';
         document.getElementById('btnSubmitPelicula').name = 'btnAgregarContenido';
     }
 
     // ===========================================
-    // MODAL DE PELÍCULA
+    // PREVIEW DE IMAGEN Y VIDEO
     // ===========================================
     const filePoster = document.getElementById('filePoster');
     if(filePoster) {
         filePoster.addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (file) {
+                // Validar tamaño (5MB)
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('⚠️ La imagen es muy grande. Tamaño máximo: 5MB');
+                    this.value = '';
+                    document.getElementById('previewImagen').style.display = 'none';
+                    return;
+                }
+                
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     document.getElementById('imgPreview').src = e.target.result;
                     document.getElementById('previewImagen').style.display = 'block';
                 }
                 reader.readAsDataURL(file);
+            } else {
+                document.getElementById('previewImagen').style.display = 'none';
+            }
+        });
+    }
+
+    const fileVideo = document.getElementById('fileVideo');
+    if(fileVideo) {
+        fileVideo.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                // Validar tamaño (200MB)
+                const sizeMB = (file.size / 1024 / 1024).toFixed(2);
+                
+                if (file.size > 200 * 1024 * 1024) {
+                    alert('⚠️ El video es muy grande. Tamaño máximo: 200MB\n\nSe recomienda usar videos cortos para mejor experiencia.');
+                    this.value = '';
+                    document.getElementById('videoInfo').style.display = 'none';
+                    return;
+                }
+                
+                // Mostrar información del video
+                document.getElementById('videoNombre').textContent = file.name;
+                document.getElementById('videoTamaño').textContent = `(${sizeMB} MB)`;
+                document.getElementById('videoInfo').style.display = 'block';
+                
+                // Advertencia si es muy grande
+                if (sizeMB > 100) {
+                    alert(`⚠️ Video grande detectado (${sizeMB} MB)\n\nPara mejor experiencia de usuario, se recomienda videos menores a 100MB.`);
+                }
+            } else {
+                document.getElementById('videoInfo').style.display = 'none';
             }
         });
     }
@@ -682,86 +775,81 @@
     // ===========================================
     // CARGAR DATOS PARA EDICIÓN
     // ===========================================
- <?php if($peliculaEditar): ?>
-    // Obtener géneros y categorías de la película
-    <?php 
-    // Obtener géneros del contenido
-    $generosContenido = ObtenerGenerosContenido($peliculaEditar['ConsecutivoContenido']);
-    $generosIds = array();
-    if($generosContenido && mysqli_num_rows($generosContenido) > 0) {
-        while($gen = mysqli_fetch_array($generosContenido)) {
-            $generosIds[] = $gen['idGenero'];
-        }
-    }
-    
-    // Obtener categorías del contenido
-    $categoriasContenido = ObtenerCategoriasContenido($peliculaEditar['ConsecutivoContenido']);
-    $categoriasIds = array();
-    if($categoriasContenido && mysqli_num_rows($categoriasContenido) > 0) {
-        while($cat = mysqli_fetch_array($categoriasContenido)) {
-            $categoriasIds[] = $cat['idCategoria'];
-        }
-    }
-    ?>
-    
-    document.addEventListener('DOMContentLoaded', function() {
-        // Llenar el formulario con los datos
-        document.getElementById('idContenido').value = '<?php echo $peliculaEditar['ConsecutivoContenido']; ?>';
-        document.getElementById('txtTitulo').value = '<?php echo addslashes($peliculaEditar['Titulo']); ?>';
-        document.getElementById('txtDescripcion').value = '<?php echo addslashes($peliculaEditar['Descripcion']); ?>';
-        document.getElementById('txtDuracion').value = '<?php echo $peliculaEditar['Duracion']; ?>';
-        document.getElementById('txtCalificacion').value = '<?php echo $peliculaEditar['CalificacionEdad']; ?>';
-        document.getElementById('txtFechaPublicacion').value = '<?php echo $peliculaEditar['fechaPublicacion']; ?>';
-        document.getElementById('imagenAnterior').value = '<?php echo $peliculaEditar['Imagen']; ?>';
-        
-        // Pre-seleccionar géneros
-        const selectGeneros = document.getElementById('selectGeneros');
-        const generosSeleccionados = [<?php echo implode(',', $generosIds); ?>];
-        for(let i = 0; i < selectGeneros.options.length; i++) {
-            if(generosSeleccionados.includes(parseInt(selectGeneros.options[i].value))) {
-                selectGeneros.options[i].selected = true;
+    <?php if($peliculaEditar): ?>
+        // Obtener géneros y categorías de la película
+        <?php 
+        // Obtener géneros del contenido
+        $generosContenido = ObtenerGenerosContenido($peliculaEditar['ConsecutivoContenido']);
+        $generosIds = array();
+        if($generosContenido && mysqli_num_rows($generosContenido) > 0) {
+            while($gen = mysqli_fetch_array($generosContenido)) {
+                $generosIds[] = $gen['idGenero'];
             }
         }
         
-        // Pre-seleccionar categorías
-        const selectCategorias = document.getElementById('selectCategorias');
-        const categoriasSeleccionadas = [<?php echo implode(',', $categoriasIds); ?>];
-        for(let i = 0; i < selectCategorias.options.length; i++) {
-            if(categoriasSeleccionadas.includes(parseInt(selectCategorias.options[i].value))) {
-                selectCategorias.options[i].selected = true;
+        // Obtener categorías del contenido
+        $categoriasContenido = ObtenerCategoriasContenido($peliculaEditar['ConsecutivoContenido']);
+        $categoriasIds = array();
+        if($categoriasContenido && mysqli_num_rows($categoriasContenido) > 0) {
+            while($cat = mysqli_fetch_array($categoriasContenido)) {
+                $categoriasIds[] = $cat['idCategoria'];
             }
         }
+        ?>
         
-        // Cambiar título del modal
-        document.getElementById('tituloModal').textContent = 'Editar Película';
-        
-        // Cambiar botón
-        const btn = document.getElementById('btnSubmitPelicula');
-        btn.innerHTML = '<i class="bi bi-check-circle me-2"></i>Actualizar Película';
-        btn.name = 'btnActualizarContenido';
-        
-        // Mostrar modal
-        const modal = new bootstrap.Modal(document.getElementById('modalPelicula'));
-        modal.show();
-        
-        // Ir a pestaña de películas
-        const tab = new bootstrap.Tab(document.querySelector('#peliculas-tab'));
-        tab.show();
-    });
-<?php endif; ?>
-function eliminarPelicula(id, titulo) {
-    if(confirm('⚠️ ¿Estás SEGURO de eliminar PERMANENTEMENTE la película "' + titulo + '"?\n\nEsta acción NO se puede deshacer y eliminará:\n- La película\n- Sus géneros\n- Sus categorías\n- De los favoritos de usuarios')) {
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.innerHTML = `
-            <input type="hidden" name="btnEliminarContenido" value="1">
-            <input type="hidden" name="idContenido" value="${id}">
-        `;
-        document.body.appendChild(form);
-        localStorage.setItem('activeTab', 'peliculas');
-        form.submit();
-    }
-}
+        document.addEventListener('DOMContentLoaded', function() {
+            // Llenar el formulario con los datos
+            document.getElementById('idContenido').value = '<?php echo $peliculaEditar['ConsecutivoContenido']; ?>';
+            document.getElementById('txtTitulo').value = '<?php echo addslashes($peliculaEditar['Titulo']); ?>';
+            document.getElementById('txtDescripcion').value = '<?php echo addslashes($peliculaEditar['Descripcion']); ?>';
+            document.getElementById('txtDuracion').value = '<?php echo $peliculaEditar['Duracion']; ?>';
+            document.getElementById('txtCalificacion').value = '<?php echo $peliculaEditar['CalificacionEdad']; ?>';
+            document.getElementById('txtFechaPublicacion').value = '<?php echo $peliculaEditar['fechaPublicacion']; ?>';
+            document.getElementById('imagenAnterior').value = '<?php echo $peliculaEditar['Imagen']; ?>';
+            document.getElementById('videoAnterior').value = '<?php echo $peliculaEditar['VideoArchivo'] ?? ''; ?>';
+            
+            // Mostrar info del video existente si hay uno
+            <?php if(!empty($peliculaEditar['VideoArchivo'])): ?>
+                document.getElementById('videoNombre').textContent = '<?php echo $peliculaEditar['VideoArchivo']; ?>';
+                document.getElementById('videoTamaño').textContent = '(Video actual)';
+                document.getElementById('videoInfo').style.display = 'block';
+            <?php endif; ?>
+            
+            // Pre-seleccionar géneros
+            const selectGeneros = document.getElementById('selectGeneros');
+            const generosSeleccionados = [<?php echo implode(',', $generosIds); ?>];
+            for(let i = 0; i < selectGeneros.options.length; i++) {
+                if(generosSeleccionados.includes(parseInt(selectGeneros.options[i].value))) {
+                    selectGeneros.options[i].selected = true;
+                }
+            }
+            
+            // Pre-seleccionar categorías
+            const selectCategorias = document.getElementById('selectCategorias');
+            const categoriasSeleccionadas = [<?php echo implode(',', $categoriasIds); ?>];
+            for(let i = 0; i < selectCategorias.options.length; i++) {
+                if(categoriasSeleccionadas.includes(parseInt(selectCategorias.options[i].value))) {
+                    selectCategorias.options[i].selected = true;
+                }
+            }
+            
+            // Cambiar título del modal
+            document.getElementById('tituloModal').textContent = 'Editar Película';
+            
+            // Cambiar botón
+            const btn = document.getElementById('btnSubmitPelicula');
+            btn.innerHTML = '<i class="bi bi-check-circle me-2"></i>Actualizar Película';
+            btn.name = 'btnActualizarContenido';
+            
+            // Mostrar modal
+            const modal = new bootstrap.Modal(document.getElementById('modalPelicula'));
+            modal.show();
+            
+            // Ir a pestaña de películas
+            const tab = new bootstrap.Tab(document.querySelector('#peliculas-tab'));
+            tab.show();
+        });
+    <?php endif; ?>
     </script>
 
 </body>

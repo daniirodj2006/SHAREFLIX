@@ -6,7 +6,7 @@
 
   if(!isset($_SESSION["ConsecutivoUsuario"]))
   {
-      header("Location: ../Inicio/IniciarSesion.php");
+      header("Location: ../../Inicio/IniciarSesion.php");
       exit();
   }
 
@@ -111,9 +111,30 @@
         }
         
         .btn-info-pelicula,
-        .btn-favorito {
+        .btn-favorito,
+        .btn-ver-ahora {
             width: 100%;
             border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-ver-ahora {
+            background: linear-gradient(135deg, #FF8C42, #FFA94D);
+            border: none;
+            color: white;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 6px 12px;
+        }
+        
+        .btn-ver-ahora:hover {
+            background: linear-gradient(135deg, #FFA94D, #FF8C42);
+            color: white;
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(255, 140, 66, 0.4);
         }
         
         .btn-favorito.active {
@@ -144,6 +165,22 @@
         .bg-shareflix {
             background: linear-gradient(135deg, #FF8C42, #FFA94D);
             border: none;
+        }
+        
+        .badge-video {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255, 140, 66, 0.9);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
     </style>
 </head>
@@ -182,7 +219,7 @@
                                     <select class="form-select" id="filtroGenero">
                                         <option value="">Todos los géneros</option>
                                         <?php foreach($generos as $genero): ?>
-                                        <option value="<?php echo $genero['nombre']; ?>">
+                                        <option value="<?php echo mb_strtolower($genero['nombre'], 'UTF-8'); ?>">
                                             <?php echo $genero['nombre']; ?>
                                         </option>
                                         <?php endforeach; ?>
@@ -194,7 +231,7 @@
                                     <select class="form-select" id="filtroCategoria">
                                         <option value="">Todas las categorías</option>
                                         <?php foreach($categorias as $categoria): ?>
-                                        <option value="<?php echo $categoria['nombre']; ?>">
+                                        <option value="<?php echo mb_strtolower($categoria['nombre'], 'UTF-8'); ?>">
                                             <?php echo $categoria['nombre']; ?>
                                         </option>
                                         <?php endforeach; ?>
@@ -223,9 +260,9 @@
                 
                 <?php foreach($peliculas as $pelicula): ?>
                 <div class="pelicula-item" 
-                     data-titulo="<?php echo strtolower($pelicula['titulo']); ?>"
-                     data-genero="<?php echo strtolower($pelicula['generos']); ?>"
-                     data-categoria="<?php echo strtolower($pelicula['categorias']); ?>">
+                     data-titulo="<?php echo mb_strtolower($pelicula['titulo'], 'UTF-8'); ?>"
+                     data-genero="<?php echo mb_strtolower($pelicula['generos'], 'UTF-8'); ?>"
+                     data-categoria="<?php echo mb_strtolower($pelicula['categorias'], 'UTF-8'); ?>">
                     
                     <!-- Portada de la película -->
                     <div class="pelicula-imagen">
@@ -241,14 +278,32 @@
                             </div>
                         <?php endif; ?>
                         
+                        <!-- Badge de video disponible -->
+                        <?php if(!empty($pelicula['video_archivo'])): ?>
+                            <span class="badge-video">
+                                <i class="bi bi-play-fill"></i>
+                                VIDEO
+                            </span>
+                        <?php endif; ?>
+                        
                         <!-- Overlay al hacer hover -->
                         <div class="pelicula-overlay">
-                            <button class="btn btn-sm btn-light btn-info-pelicula" 
-                                    onclick="verDetalles(<?php echo htmlspecialchars(json_encode($pelicula)); ?>)"
-                                    title="Ver detalles">
-                                <i class="bi bi-info-circle me-2"></i>Detalles
-                            </button>
+                            <!-- Botón Ver Ahora o Detalles -->
+                            <?php if(!empty($pelicula['video_archivo'])): ?>
+                                <a href="VerPelicula.php?id=<?php echo $pelicula['id_pelicula']; ?>" 
+                                   class="btn btn-sm btn-ver-ahora" 
+                                   title="Ver película">
+                                    <i class="bi bi-play-fill me-2"></i>Ver Ahora
+                                </a>
+                            <?php else: ?>
+                                <button class="btn btn-sm btn-light btn-info-pelicula" 
+                                        onclick="verDetalles(<?php echo htmlspecialchars(json_encode($pelicula)); ?>)"
+                                        title="Ver detalles">
+                                    <i class="bi bi-info-circle me-2"></i>Detalles
+                                </button>
+                            <?php endif; ?>
                             
+                            <!-- Botón de Favoritos -->
                             <?php if(in_array($pelicula['id_pelicula'], $idsFavoritos)): ?>
                                 <!-- Ya está en favoritos -->
                                 <button class="btn btn-sm btn-danger btn-favorito active" 
@@ -326,10 +381,7 @@
                                     <strong>Duración:</strong> 
                                     <span id="duracionDetalles"></span> minutos
                                 </p>
-                                <p class="mb-0">
-                                    <strong>Calificación:</strong> 
-                                    <span id="calificacionDetalles"></span>
-                                </p>
+                              
                             </div>
                             
                             <div>
@@ -363,7 +415,6 @@
             document.getElementById('categoriaDetalles').textContent = pelicula.categorias || 'Sin categoría';
             document.getElementById('anioDetalles').textContent = pelicula.anio;
             document.getElementById('duracionDetalles').textContent = pelicula.duracion;
-            document.getElementById('calificacionDetalles').textContent = pelicula.calificacion_edad;
             document.getElementById('descripcionDetalles').textContent = pelicula.descripcion || 'Sin descripción disponible';
             
             const modal = new bootstrap.Modal(document.getElementById('modalDetalles'));
@@ -404,7 +455,7 @@
             document.getElementById('noResultados').style.display = contador === 0 ? 'block' : 'none';
         }
     </script>
-    <script src="../js/Catalogo.js"></script>
+    <script src="../../js/Catalogo.js"></script>
 
 </body>
 </html>
