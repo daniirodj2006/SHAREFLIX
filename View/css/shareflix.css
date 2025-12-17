@@ -143,6 +143,14 @@ body {
     transition: all 0.3s ease;
     text-decoration: none;
     display: inline-block;
+    background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+    color: white;
+}
+
+.btn-shareflix:hover {
+    background: linear-gradient(135deg, var(--color-secondary), var(--color-primary));
+    color: white;
+    transform: scale(1.05);
 }
 
 .btn-primary-shareflix {
@@ -167,6 +175,53 @@ body {
     background: var(--color-primary);
     color: var(--color-dark);
     transform: translateY(-3px);
+}
+
+.btn-filter {
+    padding: 8px 20px;
+    background: rgba(255, 140, 66, 0.1);
+    border: 1px solid var(--color-primary);
+    color: var(--color-primary);
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-filter:hover,
+.btn-filter.active {
+    background: var(--color-primary);
+    color: var(--color-dark);
+}
+
+.btn-action-edit {
+    background: rgba(255, 184, 77, 0.2);
+    color: var(--color-secondary);
+    border: none;
+    margin-right: 5px;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-action-edit:hover {
+    background: var(--color-secondary);
+    color: var(--color-dark);
+}
+
+.btn-action-delete {
+    background: rgba(220, 53, 69, 0.2);
+    color: #dc3545;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-action-delete:hover {
+    background: #dc3545;
+    color: #fff;
 }
 
 /* ============================================
@@ -222,7 +277,8 @@ body {
 .form-control-shareflix {
     background-color: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 140, 66, 0.2);
-    color: var(--color-text);
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
     padding: 12px 15px;
     border-radius: 10px;
     transition: all 0.3s ease;
@@ -233,12 +289,23 @@ body {
     background-color: rgba(255, 255, 255, 0.08);
     border-color: var(--color-primary);
     box-shadow: 0 0 0 0.2rem rgba(255, 140, 66, 0.25);
-    color: var(--color-text);
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
     outline: none;
 }
 
 .form-control-shareflix::placeholder {
     color: rgba(245, 245, 245, 0.3);
+}
+
+.form-control-shareflix:-webkit-autofill,
+.form-control-shareflix:-webkit-autofill:hover,
+.form-control-shareflix:-webkit-autofill:focus,
+.form-control-shareflix:-webkit-autofill:active {
+    -webkit-text-fill-color: #ffffff !important;
+    -webkit-box-shadow: 0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important;
+    box-shadow: 0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important;
+    transition: background-color 5000s ease-in-out 0s;
 }
 
 .divider-shareflix {
@@ -320,19 +387,16 @@ body {
 }
 
 .content-wrapper {
+    margin-left: 250px;
     padding: 2rem;
-    min-height: calc(100vh - 80px);
+    min-height: 100vh;
+    background: #0f0f0f;
 }
 
 /* ============================================
    SIDEBAR Y MENU
    ============================================ */
 
-/* ========================================
-   SIDEBAR Y LAYOUT
-======================================== */
-
-/* Sidebar fijo a la izquierda */
 .sidebar {
     position: fixed;
     left: 0;
@@ -343,29 +407,6 @@ body {
     padding: 1rem;
     z-index: 1000;
     overflow-y: auto;
-}
-
-
-.content-wrapper {
-    margin-left: 250px; 
-    min-height: 100vh;
-    background: #0f0f0f;
-}
-
-/* Para pantallas pequeñas (móviles) */
-@media (max-width: 768px) {
-    .sidebar {
-        transform: translateX(-100%);
-        transition: transform 0.3s ease;
-    }
-    
-    .sidebar.active {
-        transform: translateX(0);
-    }
-    
-    .content-wrapper {
-        margin-left: 0;
-    }
 }
 
 .sidebar-logo {
@@ -440,22 +481,6 @@ body {
     flex-wrap: wrap;
 }
 
-.btn-filter {
-    padding: 8px 20px;
-    background: rgba(255, 140, 66, 0.1);
-    border: 1px solid var(--color-primary);
-    color: var(--color-primary);
-    border-radius: 25px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.btn-filter:hover,
-.btn-filter.active {
-    background: var(--color-primary);
-    color: var(--color-dark);
-}
-
 /* ============================================
    CARDS DE CONTENIDO
    ============================================ */
@@ -469,6 +494,7 @@ body {
 
 .content-card {
     background: var(--color-dark-light);
+    border: 1px solid rgba(255, 140, 66, 0.2);
     border-radius: 15px;
     overflow: hidden;
     transition: all 0.3s ease;
@@ -480,6 +506,7 @@ body {
 .content-card:hover {
     transform: translateY(-10px);
     box-shadow: 0 8px 30px rgba(255, 140, 66, 0.3);
+    border-color: var(--color-primary);
 }
 
 .content-card-img {
@@ -516,7 +543,6 @@ body {
     font-size: 0.9rem;
     margin-bottom: 1rem;
     display: -webkit-box;
-   
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
@@ -559,16 +585,21 @@ body {
     margin-bottom: 0.5rem;
 }
 
-.stat-card {
+.stat-card,
+.stats-card {
+    background: var(--color-dark-light);
     border-radius: 15px;
     padding: 1.5rem;
     border: 1px solid rgba(255, 140, 66, 0.2);
     transition: all 0.3s ease;
+    height: 100%;
 }
 
-.stat-card:hover {
+.stat-card:hover,
+.stats-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 8px 20px rgba(255, 140, 66, 0.2);
+    box-shadow: 0 8px 25px rgba(255, 140, 66, 0.3);
+    border-color: var(--color-primary);
 }
 
 .stat-card-primary {
@@ -589,9 +620,16 @@ body {
     align-items: center;
 }
 
-.stat-card-icon {
+.stat-card-icon,
+.stats-icon {
     font-size: 3rem;
     opacity: 0.5;
+    width: 60px;
+    height: 60px;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .stat-card-primary .stat-card-icon {
@@ -637,27 +675,36 @@ body {
 }
 
 .quick-action-card {
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
-    padding: 1.5rem;
     background: var(--color-dark-light);
     border: 1px solid rgba(255, 140, 66, 0.2);
     border-radius: 15px;
+    padding: 1.5rem;
+    text-align: center;
+    transition: all 0.3s ease;
     text-decoration: none;
     color: var(--color-text);
-    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
 }
 
 .quick-action-card:hover {
-    background: rgba(255, 140, 66, 0.05);
-    transform: translateX(10px);
+    background: rgba(255, 140, 66, 0.1);
     border-color: var(--color-primary);
+    transform: translateY(-5px);
+    color: var(--color-text);
 }
 
 .quick-action-icon {
     font-size: 2.5rem;
     color: var(--color-primary);
+    width: 60px;
+    height: 60px;
+    border-radius: 15px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
 }
 
 .quick-action-content h5 {
@@ -687,6 +734,7 @@ body {
     border-radius: 15px;
     overflow: hidden;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    color: var(--color-text);
 }
 
 .table-shareflix thead {
@@ -721,11 +769,7 @@ body {
     display: inline-block;
 }
 
-.badge-age-rating {
-    background: rgba(255, 140, 66, 0.2);
-    color: var(--color-primary);
-}
-
+.badge-age-rating,
 .badge-type {
     background: rgba(255, 140, 66, 0.2);
     color: var(--color-primary);
@@ -762,39 +806,162 @@ body {
 }
 
 /* ============================================
-   RESPONSIVE
+   TABS
    ============================================ */
 
-@media (max-width: 768px) {
-    .hero-title {
-        font-size: 2.5rem;
-    }
+.nav-tabs {
+    border-bottom: 2px solid rgba(255, 140, 66, 0.2);
+}
 
-    .hero-subtitle {
-        font-size: 1.1rem;
-    }
+.nav-tabs .nav-link {
+    color: var(--color-text-muted);
+    border: none;
+    padding: 1rem 1.5rem;
+    transition: all 0.3s ease;
+}
 
-    .content-grid {
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-        gap: 1rem;
-    }
+.nav-tabs .nav-link:hover {
+    color: var(--color-primary);
+    background: rgba(255, 140, 66, 0.1);
+    border: none;
+}
 
-    .sidebar {
-        transform: translateX(-100%);
-    }
-
-    .layout-page {
-        margin-left: 0;
-    }
-
-    .auth-card {
-        padding: 2rem;
-    }
+.nav-tabs .nav-link.active {
+    color: var(--color-primary);
+    background: rgba(255, 140, 66, 0.15);
+    border: none;
+    border-bottom: 3px solid var(--color-primary);
 }
 
 /* ============================================
-   UTILIDADES BOOTSTRAP OVERRIDE
+   LIST GROUP
    ============================================ */
+
+.list-group-item {
+    background: var(--color-dark-light);
+    border: 1px solid rgba(255, 140, 66, 0.1);
+    color: var(--color-text);
+    margin-bottom: 0.5rem;
+    border-radius: 10px !important;
+}
+
+.list-group-item:hover {
+    background: rgba(255, 140, 66, 0.05);
+    border-color: var(--color-primary);
+}
+
+/* ============================================
+   MODALES
+   ============================================ */
+
+.modal-shareflix {
+    background: var(--color-dark-light);
+    border: 1px solid rgba(255, 140, 66, 0.2);
+}
+
+.modal-header-shareflix {
+    border-bottom: 1px solid rgba(255, 140, 66, 0.2);
+}
+
+.modal-footer-shareflix {
+    border-top: 1px solid rgba(255, 140, 66, 0.2);
+}
+
+.btn-close-white {
+    filter: invert(1);
+}
+
+/* ============================================
+   IMÁGENES Y PLACEHOLDERS
+   ============================================ */
+
+.pelicula-imagen {
+    position: relative;
+    overflow: hidden;
+    border-radius: 10px;
+    aspect-ratio: 2/3;
+}
+
+.pelicula-imagen img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.placeholder-poster {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-dark);
+    padding: 20px;
+    text-align: center;
+}
+
+.placeholder-poster i {
+    font-size: 3rem;
+    margin-bottom: 10px;
+    opacity: 0.8;
+}
+
+.placeholder-poster p {
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin: 0;
+    line-height: 1.2;
+    opacity: 0.9;
+}
+
+.avatar-circle {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+}
+
+/* ============================================
+   ESTADOS VACÍOS
+   ============================================ */
+
+.empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    grid-column: 1 / -1;
+}
+
+.empty-state-icon {
+    font-size: 5rem;
+    color: var(--color-primary);
+    opacity: 0.5;
+}
+
+.empty-favorites-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 4rem 2rem;
+}
+
+/* ============================================
+   UTILIDADES
+   ============================================ */
+
+.bg-shareflix-light {
+    background: rgba(255, 140, 66, 0.15);
+}
+
+.text-shareflix {
+    color: var(--color-primary) !important;
+}
+
+.bg-shareflix {
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%) !important;
+}
 
 .text-center {
     text-align: center;
@@ -849,350 +1016,281 @@ body {
 }
 
 /* ============================================
-   MODALES
+   RESPONSIVE
    ============================================ */
 
-.modal-shareflix {
-    background: var(--color-dark-light);
-    border: 1px solid rgba(255, 140, 66, 0.2);
-}
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 2.5rem;
+    }
 
-.modal-header-shareflix {
-    border-bottom: 1px solid rgba(255, 140, 66, 0.2);
-}
+    .hero-subtitle {
+        font-size: 1.1rem;
+    }
 
-.modal-footer-shareflix {
-    border-top: 1px solid rgba(255, 140, 66, 0.2);
-}
+    .content-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1rem;
+    }
 
-.btn-close-white {
-    filter: invert(1);
-}
+    .sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+    }
+    
+    .sidebar.active {
+        transform: translateX(0);
+    }
 
+    .layout-page,
+    .content-wrapper {
+        margin-left: 0;
+    }
+
+    .auth-card {
+        padding: 2rem;
+    }
+}
 /* ============================================
-   BOTONES DE ACCIÓN
+   CATÁLOGO DE PELÍCULAS - GRID Y CARDS
    ============================================ */
 
-.btn-action-edit {
-    background: rgba(255, 184, 77, 0.2);
-    color: var(--color-secondary);
-    border: none;
-    margin-right: 5px;
-    padding: 5px 10px;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.btn-action-edit:hover {
-    background: var(--color-secondary);
-    color: var(--color-dark);
-}
-
-.btn-action-delete {
-    background: rgba(220, 53, 69, 0.2);
-    color: #dc3545;
-    border: none;
-    padding: 5px 10px;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.btn-action-delete:hover {
-    background: #dc3545;
-    color: #fff;
-}
-
+/* Grid principal de películas */
 /* ============================================
-   ESTADOS VACÍOS
+   CATÁLOGO DE PELÍCULAS - GRID Y CARDS
    ============================================ */
 
-.empty-state {
-    text-align: center;
-    padding: 3rem 1rem;
-    grid-column: 1 / -1;
-}
-
-.empty-state-icon {
-    font-size: 5rem;
-    color: var(--color-primary);
-    opacity: 0.5;
-}
-
-.empty-favorites-state {
-    grid-column: 1 / -1;
-    text-align: center;
-    padding: 4rem 2rem;
-}
-
-
-
-.form-control-shareflix {
-    color: #ffffff !important;
-    -webkit-text-fill-color: #ffffff !important;
-}
-
-.form-control-shareflix:focus,
-.form-control-shareflix:active,
-.form-control-shareflix:hover,
-.form-control-shareflix:valid {
-    color: #ffffff !important;
-    -webkit-text-fill-color: #ffffff !important;
-}
-
-/* Prevenir que autocomplete cambie el color */
-.form-control-shareflix:-webkit-autofill,
-.form-control-shareflix:-webkit-autofill:hover,
-.form-control-shareflix:-webkit-autofill:focus,
-.form-control-shareflix:-webkit-autofill:active {
-    -webkit-text-fill-color: #ffffff !important;
-    -webkit-box-shadow: 0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important;
-    box-shadow: 0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important;
-    transition: background-color 5000s ease-in-out 0s;
-}
-
-
-
-
-/* Contenedor principal - darle espacio para el menú lateral */
-.content-wrapper {
-    margin-left: 250px; /* Ajusta según el ancho de tu menú */
-    padding: 20px;
-    min-height: 100vh;
-}
-
-/* El menú lateral debe estar fijo */
-.sidebar {
-    position: fixed;
-    left: 0;
-    top: 0;
-    width: 250px;
-    height: 100vh;
-    background: #1a1a1a;
-    z-index: 100;
-}
-
-/* ============================================
-   ESTILOS ADICIONALES PARA DASHBOARD ADMIN
-   ============================================ */
-
-.dashboard-title {
-    font-size: 2rem;
-    font-weight: bold;
-    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
-
-.stats-card {
-    background: var(--color-dark-light);
-    border-radius: 15px;
-    padding: 1.5rem;
-    border: 1px solid rgba(255, 140, 66, 0.2);
-    transition: all 0.3s ease;
-    height: 100%;
-}
-
-.stats-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(255, 140, 66, 0.3);
-    border-color: var(--color-primary);
-}
-
-.stats-icon {
-    width: 60px;
-    height: 60px;
-    border-radius: 15px;
+/* Grid principal de películas */
+#gridPeliculas {
     display: flex;
-    align-items: center;
+    flex-wrap: wrap;
     justify-content: center;
-    font-size: 1.8rem;
+    gap: 1.5rem;
+    margin-top: 2rem;
 }
 
-.bg-shareflix-light {
-    background: rgba(255, 140, 66, 0.15);
+/* Item individual de película */
+.pelicula-item {
+    flex: 0 0 auto;
+    width: 160px;
 }
 
-.text-shareflix {
-    color: var(--color-primary) !important;
-}
-
-.bg-shareflix {
-    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%) !important;
-}
-
-.avatar-circle {
-    width: 45px;
-    height: 45px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.3rem;
-}
-
-.quick-action-card {
-    background: var(--color-dark-light);
-    border: 1px solid rgba(255, 140, 66, 0.2);
-    border-radius: 15px;
-    padding: 1.5rem;
-    text-align: center;
-    transition: all 0.3s ease;
-    text-decoration: none;
-    color: var(--color-text);
-    display: block;
-}
-
-.quick-action-card:hover {
-    background: rgba(255, 140, 66, 0.1);
-    border-color: var(--color-primary);
-    transform: translateY(-5px);
-    color: var(--color-text);
-}
-
-.quick-action-icon {
-    width: 60px;
-    height: 60px;
-    border-radius: 15px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.8rem;
-    margin: 0 auto;
-}
-
-.badge-admin {
-    background: rgba(255, 140, 66, 0.2);
-    color: var(--color-primary);
-}
-
-/* ============================================
-   TABS PARA GESTIÓN DE CONTENIDO
-   ============================================ */
-
-.nav-tabs {
-    border-bottom: 2px solid rgba(255, 140, 66, 0.2);
-}
-
-.nav-tabs .nav-link {
-    color: var(--color-text-muted);
-    border: none;
-    padding: 1rem 1.5rem;
-    transition: all 0.3s ease;
-}
-
-.nav-tabs .nav-link:hover {
-    color: var(--color-primary);
-    background: rgba(255, 140, 66, 0.1);
-    border: none;
-}
-
-.nav-tabs .nav-link.active {
-    color: var(--color-primary);
-    background: rgba(255, 140, 66, 0.15);
-    border: none;
-    border-bottom: 3px solid var(--color-primary);
-}
-
-/* Estilos para las tarjetas de contenido */
-.content-card {
-    background: var(--color-dark-light);
-    border: 1px solid rgba(255, 140, 66, 0.2);
-    border-radius: 15px;
-    transition: all 0.3s ease;
-}
-
-.content-card:hover {
-    border-color: var(--color-primary);
-    box-shadow: 0 5px 20px rgba(255, 140, 66, 0.2);
-}
-
-/* Tabla de contenido */
-.table-shareflix {
-    color: var(--color-text);
-}
-
-.table-shareflix thead {
-    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
-    color: var(--color-dark);
-}
-
-.table-shareflix tbody tr {
-    border-bottom: 1px solid rgba(255, 140, 66, 0.1);
-}
-
-.table-shareflix tbody tr:hover {
-    background: rgba(255, 140, 66, 0.05);
-}
-
-/* List group para géneros y categorías */
-.list-group-item {
-    background: var(--color-dark-light);
-    border: 1px solid rgba(255, 140, 66, 0.1);
-    color: var(--color-text);
-    margin-bottom: 0.5rem;
-    border-radius: 10px !important;
-}
-
-.list-group-item:hover {
-    background: rgba(255, 140, 66, 0.05);
-    border-color: var(--color-primary);
-}
-
-/* ============================================
-   PLACEHOLDER PARA IMÁGENES DE PELÍCULAS
-   ============================================ */
-
+/* Contenedor de imagen con hover */
 .pelicula-imagen {
     position: relative;
     overflow: hidden;
     border-radius: 10px;
-    aspect-ratio: 2/3; /* Proporción de póster de película */
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    background: #1a1a1a;
+}
+
+.pelicula-imagen:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(255, 140, 66, 0.4);
 }
 
 .pelicula-imagen img {
     width: 100%;
-    height: 100%;
+    height: 240px;
     object-fit: cover;
+    display: block;
 }
 
+/* Placeholder cuando no hay imagen */
 .placeholder-poster {
     width: 100%;
-    height: 100%;
-    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+    height: 240px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    color: var(--color-dark);
-    padding: 20px;
-    text-align: center;
+    background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+    color: white;
 }
 
 .placeholder-poster i {
-    font-size: 3rem;
-    margin-bottom: 10px;
-    opacity: 0.8;
+    font-size: 2.5rem;
+    margin-bottom: 0.8rem;
 }
 
 .placeholder-poster p {
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     font-weight: 600;
+    text-align: center;
+    padding: 0 10px;
     margin: 0;
-    line-height: 1.2;
-    opacity: 0.9;
-}
-.btn-shareflix {
-    background: linear-gradient(135deg, #FF8C42, #FFA94D);
-    border: none;
-    color: white;
-    font-weight: 600;
 }
 
-.btn-shareflix:hover {
-    background: linear-gradient(135deg, #FFA94D, #FF8C42);
+/* Overlay con botones al hacer hover */
+.pelicula-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.4) 50%, transparent 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 12px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    gap: 6px;
+}
+
+.pelicula-imagen:hover .pelicula-overlay {
+    opacity: 1;
+}
+
+/* Botones dentro del overlay */
+.btn-info-pelicula,
+.btn-favorito,
+.btn-ver-ahora {
+    width: 100%;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    padding: 6px 10px;
+    transition: all 0.3s ease;
+}
+
+.btn-ver-ahora {
+    background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+    border: none;
+    color: white;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-ver-ahora:hover {
+    background: linear-gradient(135deg, var(--color-secondary), var(--color-primary));
     color: white;
     transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(255, 140, 66, 0.4);
+}
+
+.btn-favorito.active {
+    background: #dc3545;
+    border-color: #dc3545;
+}
+
+/* Badge de video disponible */
+.badge-video {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: rgba(255, 140, 66, 0.95);
+    color: white;
+    padding: 3px 8px;
+    border-radius: 5px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+
+/* Info debajo de la película */
+.pelicula-info {
+    padding: 8px 4px;
+}
+
+.pelicula-titulo {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--color-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 0.3rem;
+}
+
+.pelicula-meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 4px;
+}
+
+.pelicula-meta .badge {
+    font-size: 0.7rem;
+    padding: 3px 8px;
+}
+
+.pelicula-meta .small {
+    font-size: 0.75rem;
+}
+
+/* ============================================
+   RESPONSIVE PARA CATÁLOGO
+   ============================================ */
+
+@media (max-width: 768px) {
+    #gridPeliculas {
+        gap: 1rem;
+    }
+    
+    .pelicula-item {
+        width: 140px;
+    }
+    
+    .pelicula-imagen img,
+    .placeholder-poster {
+        height: 210px;
+    }
+}
+
+@media (max-width: 480px) {
+    .pelicula-item {
+        width: 130px;
+    }
+    
+    .pelicula-imagen img,
+    .placeholder-poster {
+        height: 195px;
+    }
+    
+    .pelicula-titulo {
+        font-size: 0.85rem;
+    }
+}
+.pelicula-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 5px;
+}
+
+/* ============================================
+   RESPONSIVE PARA CATÁLOGO
+   ============================================ */
+
+@media (max-width: 768px) {
+    #gridPeliculas {
+        gap: 1rem;
+    }
+    
+    .pelicula-item {
+        width: 150px;
+    }
+    
+    .pelicula-imagen img {
+        height: 225px;
+    }
+}
+
+@media (max-width: 480px) {
+    .pelicula-item {
+        width: 140px;
+    }
+    
+    .pelicula-imagen img {
+        height: 210px;
+    }
 }

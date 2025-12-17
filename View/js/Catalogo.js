@@ -1,7 +1,9 @@
+// ========================================
+// SHAREFLIX - CATÁLOGO DE PELÍCULAS
+// Sistema de Favoritos + Búsqueda y Filtros
+// ========================================
 
-//SECCIÓN 1: BÚSQUEDA DE PELÍCULAS
- 
-
+// SECCIÓN 1: BÚSQUEDA DE PELÍCULAS
 document.addEventListener('DOMContentLoaded', function() {
     const inputBuscar = document.getElementById('buscarPelicula');
     
@@ -12,10 +14,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-
- // SECCIÓN 2: FILTROS POR GÉNERO Y CATEGORÍA
-
-
+// SECCIÓN 2: FILTROS POR GÉNERO Y CATEGORÍA
 document.addEventListener('DOMContentLoaded', function() {
     const filtroGenero = document.getElementById('filtroGenero');
     const filtroCategoria = document.getElementById('filtroCategoria');
@@ -98,108 +97,162 @@ function actualizarContador(cantidad) {
     }
 }
 
+// ========================================
+// SECCIÓN 3: SISTEMA DE FAVORITOS
+// ========================================
 
- // SECCIÓN 3: AGREGAR A FAVORITOS
- 
+/**
+ * Agregar película a favoritos
+ * CORREGIDO: Ahora envía los parámetros correctos al controlador
+ */
 function agregarFavorito(idPelicula) {
+    console.log('Agregando a favoritos:', idPelicula);
+    
     // Verificar límite para usuarios gratis
     if (idRol === 2) { // Rol 2 = Gratis
         // Contar cuántos favoritos activos tiene
         const favoritosActuales = document.querySelectorAll('.btn-favorito.active').length;
         
         if (favoritosActuales >= limiteGratis) {
-            alert('Has alcanzado el límite de ' + limiteGratis + ' películas favoritas.\n\n' +
-                  '¡Actualiza a Premium para agregar favoritos ilimitados!');
+            mostrarAlertaUpgrade();
             return;
         }
     }
     
-    // Crear FormData
+    // Crear FormData con los nombres CORRECTOS que espera el controlador
     const formData = new FormData();
-    formData.append('accion', 'agregar');
-    formData.append('idPelicula', idPelicula);
-    formData.append('idUsuario', idUsuario);
+    formData.append('agregarFavoritoAjax', '1');  // ✅ Nombre correcto
+    formData.append('idContenido', idPelicula);    // ✅ Nombre correcto
     
     // Enviar al servidor
-    fetch('../../Controller/FavoritosController.php', {
+    fetch('../../Controller/FavoritoController.php', {  // ✅ Ruta correcta
         method: 'POST',
         body: formData
     })
     .then(response => response.json())
     .then(data => {
+        console.log('Respuesta del servidor:', data);
+        
         if (data.success) {
             // Cambiar el botón visualmente
-            const botones = document.querySelectorAll(`[onclick*="agregarFavorito(${idPelicula})"]`);
-            botones.forEach(btn => {
-                btn.classList.remove('btn-outline-light');
-                btn.classList.add('btn-danger', 'active');
-                btn.innerHTML = '<i class="bi bi-heart-fill"></i>';
-                btn.setAttribute('onclick', `quitarFavorito(${idPelicula})`);
-                btn.setAttribute('title', 'Quitar de favoritos');
-            });
+            actualizarBotonFavorito(idPelicula, true);
             
-            // Mostrar mensaje
-            mostrarNotificacion('¡Agregado a favoritos!', 'success');
+            // Mostrar mensaje de éxito
+            mostrarNotificacion('¡Agregado a favoritos! 💕', 'success');
         } else {
-            alert('Error: ' + data.mensaje);
+            // Si hay error o límite alcanzado
+            if (data.limite) {
+                mostrarAlertaUpgrade();
+            } else {
+                mostrarNotificacion(data.mensaje || 'Error al agregar a favoritos', 'error');
+            }
         }
     })
     .catch(error => {
-        console.error('Error:', error);
-        alert('Hubo un error al agregar a favoritos');
+        console.error('Error en la petición:', error);
+        mostrarNotificacion('Hubo un error al agregar a favoritos', 'error');
     });
 }
 
- // SECCIÓN 4: QUITAR DE FAVORITOS
-
-
+/**
+ * Quitar película de favoritos
+ * CORREGIDO: Ahora envía los parámetros correctos al controlador
+ */
 function quitarFavorito(idPelicula) {
+    console.log('Quitando de favoritos:', idPelicula);
+    
     if (confirm('¿Quieres quitar esta película de tus favoritos?')) {
-        // Crear FormData
+        // Crear FormData con los nombres CORRECTOS que espera el controlador
         const formData = new FormData();
-        formData.append('accion', 'quitar');
-        formData.append('idPelicula', idPelicula);
-        formData.append('idUsuario', idUsuario);
+        formData.append('eliminarFavoritoAjax', '1');  // ✅ Nombre correcto
+        formData.append('idContenido', idPelicula);     // ✅ Nombre correcto
         
         // Enviar al servidor
-        fetch('../../Controller/FavoritosController.php', {
+        fetch('../../Controller/FavoritoController.php', {
             method: 'POST',
             body: formData
         })
         .then(response => response.json())
         .then(data => {
+            console.log('Respuesta del servidor:', data);
+            
             if (data.success) {
                 // Cambiar el botón visualmente
-                const botones = document.querySelectorAll(`[onclick*="quitarFavorito(${idPelicula})"]`);
-                botones.forEach(btn => {
-                    btn.classList.remove('btn-danger', 'active');
-                    btn.classList.add('btn-outline-light');
-                    btn.innerHTML = '<i class="bi bi-heart"></i>';
-                    btn.setAttribute('onclick', `agregarFavorito(${idPelicula})`);
-                    btn.setAttribute('title', 'Agregar a favoritos');
-                });
+                actualizarBotonFavorito(idPelicula, false);
                 
                 // Mostrar mensaje
                 mostrarNotificacion('Quitado de favoritos', 'info');
             } else {
-                alert('Error: ' + data.mensaje);
+                mostrarNotificacion(data.mensaje || 'Error al quitar de favoritos', 'error');
             }
         })
         .catch(error => {
-            console.error('Error:', error);
-            alert('Hubo un error al quitar de favoritos');
+            console.error('Error en la petición:', error);
+            mostrarNotificacion('Hubo un error al quitar de favoritos', 'error');
         });
     }
 }
 
- //SECCIÓN 5: VER DETALLES DE PELÍCULA
- 
+/**
+ * Actualizar visualmente el botón de favorito
+ */
+function actualizarBotonFavorito(idPelicula, esAgregar) {
+    // Buscar todos los botones de esta película
+    const selectores = [
+        `[onclick*="agregarFavorito(${idPelicula})"]`,
+        `[onclick*="quitarFavorito(${idPelicula})"]`
+    ];
+    
+    selectores.forEach(selector => {
+        const botones = document.querySelectorAll(selector);
+        botones.forEach(btn => {
+            if (esAgregar) {
+                // Cambiar a estado "EN FAVORITOS"
+                btn.classList.remove('btn-outline-light');
+                btn.classList.add('btn-danger', 'active');
+                btn.innerHTML = '<i class="bi bi-heart-fill me-2"></i>Quitar';
+                btn.setAttribute('onclick', `quitarFavorito(${idPelicula})`);
+                btn.setAttribute('title', 'Quitar de favoritos');
+            } else {
+                // Cambiar a estado "NO EN FAVORITOS"
+                btn.classList.remove('btn-danger', 'active');
+                btn.classList.add('btn-outline-light');
+                btn.innerHTML = '<i class="bi bi-heart me-2"></i>Favorito';
+                btn.setAttribute('onclick', `agregarFavorito(${idPelicula})`);
+                btn.setAttribute('title', 'Agregar a favoritos');
+            }
+        });
+    });
+}
+
+/**
+ * Mostrar alerta de upgrade a Premium
+ */
+function mostrarAlertaUpgrade() {
+    const mensaje = `
+        <div class="text-center">
+            <i class="bi bi-heart-fill" style="font-size: 3rem; color: #FF8C42;"></i>
+            <h5 class="mt-3 mb-2">¡Límite Alcanzado!</h5>
+            <p class="mb-3">Has alcanzado el límite de ${limiteGratis} películas favoritas.</p>
+            <p class="text-muted">Actualiza a <strong>Premium</strong> para agregar favoritos ilimitados 💎</p>
+        </div>
+    `;
+    
+    // Puedes usar SweetAlert o un modal de Bootstrap
+    alert('Has alcanzado el límite de ' + limiteGratis + ' películas favoritas.\n\n' +
+          '¡Actualiza a Premium para agregar favoritos ilimitados! 💎');
+}
+
+// ========================================
+// SECCIÓN 4: VER DETALLES DE PELÍCULA
+// ========================================
+
 function verDetalles(pelicula) {
     // Llenar los datos en el modal
     document.getElementById('tituloDetalles').textContent = pelicula.titulo;
-    document.getElementById('imagenDetalles').src = pelicula.imagen_url;
-    document.getElementById('generoDetalles').textContent = pelicula.genero;
-    document.getElementById('categoriaDetalles').textContent = pelicula.categoria;
+    document.getElementById('imagenDetalles').src = pelicula.imagen_url || '';
+    document.getElementById('generoDetalles').textContent = pelicula.generos || 'Sin género';
+    document.getElementById('categoriaDetalles').textContent = pelicula.categorias || 'Sin categoría';
     document.getElementById('anioDetalles').textContent = pelicula.anio;
     document.getElementById('duracionDetalles').textContent = pelicula.duracion;
     document.getElementById('descripcionDetalles').textContent = pelicula.descripcion || 'Sin descripción disponible';
@@ -212,17 +265,27 @@ function verDetalles(pelicula) {
     
     if (yaFavorito) {
         btnFavorito.innerHTML = '<i class="bi bi-heart-fill me-2"></i>Quitar de Favoritos';
+        btnFavorito.className = 'btn btn-danger';
         btnFavorito.onclick = function() {
             quitarFavorito(pelicula.id_pelicula);
             // Cerrar modal
-            bootstrap.Modal.getInstance(document.getElementById('modalDetalles')).hide();
+            const modalElement = document.getElementById('modalDetalles');
+            const modalInstance = bootstrap.Modal.getInstance(modalElement);
+            if (modalInstance) {
+                modalInstance.hide();
+            }
         };
     } else {
         btnFavorito.innerHTML = '<i class="bi bi-heart me-2"></i>Agregar a Favoritos';
+        btnFavorito.className = 'btn btn-shareflix';
         btnFavorito.onclick = function() {
             agregarFavorito(pelicula.id_pelicula);
             // Cerrar modal
-            bootstrap.Modal.getInstance(document.getElementById('modalDetalles')).hide();
+            const modalElement = document.getElementById('modalDetalles');
+            const modalInstance = bootstrap.Modal.getInstance(modalElement);
+            if (modalInstance) {
+                modalInstance.hide();
+            }
         };
     }
     
@@ -231,16 +294,33 @@ function verDetalles(pelicula) {
     modal.show();
 }
 
- // SECCIÓN 6: NOTIFICACIONES
+// ========================================
+// SECCIÓN 5: NOTIFICACIONES
+// ========================================
 
 function mostrarNotificacion(mensaje, tipo) {
+    // Determinar color según el tipo
+    let claseAlerta = 'alert-info';
+    let icono = 'bi-info-circle';
+    
+    if (tipo === 'success') {
+        claseAlerta = 'alert-success';
+        icono = 'bi-check-circle-fill';
+    } else if (tipo === 'error') {
+        claseAlerta = 'alert-danger';
+        icono = 'bi-exclamation-circle-fill';
+    }
+    
     // Crear elemento de notificación
     const notificacion = document.createElement('div');
-    notificacion.className = `alert alert-${tipo === 'success' ? 'success' : 'info'} alert-dismissible fade show position-fixed`;
-    notificacion.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 250px;';
+    notificacion.className = `alert ${claseAlerta} alert-dismissible fade show position-fixed`;
+    notificacion.style.cssText = 'top: 80px; right: 20px; z-index: 9999; min-width: 280px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);';
     notificacion.innerHTML = `
-        ${mensaje}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        <div class="d-flex align-items-center">
+            <i class="bi ${icono} me-2" style="font-size: 1.2rem;"></i>
+            <div class="flex-grow-1">${mensaje}</div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
     `;
     
     // Agregar al body
@@ -253,3 +333,10 @@ function mostrarNotificacion(mensaje, tipo) {
     }, 3000);
 }
 
+// ========================================
+// LOGS DE DEPURACIÓN
+// ========================================
+console.log('✅ Catalogo.js cargado correctamente');
+console.log('Usuario ID:', typeof idUsuario !== 'undefined' ? idUsuario : 'No definido');
+console.log('Rol ID:', typeof idRol !== 'undefined' ? idRol : 'No definido');
+console.log('Límite Gratis:', typeof limiteGratis !== 'undefined' ? limiteGratis : 'No definido');
