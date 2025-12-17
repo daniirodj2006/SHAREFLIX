@@ -29,7 +29,7 @@ function CargarTemplateEmail($nombreTemplate, $variables = array())
 function EnviarCorreo($destinatario, $asunto, $mensaje)
 {
     $correoSalida = "drodriguez90518@ufide.ac.cr"; // Correo Institucional personal
-    $contrasennaSalida = "Torti2006"; // Contraseña del correo
+    $contrasennaSalida = ""; // Contraseña del correo
 
     $mail = new PHPMailer(true);
     $mail->CharSet = 'UTF-8';
