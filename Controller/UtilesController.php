@@ -28,7 +28,7 @@ function CargarTemplateEmail($nombreTemplate, $variables = array())
 // ENVIAR EMAIL CON PHPMAILER
 function EnviarCorreo($destinatario, $asunto, $mensaje)
 {
-    $correoSalida = "drodriguez90518@ufide.ac.cr"; // Correo Institucional personal
+    $correoSalida = ""; // Correo Institucional personal
     $contrasennaSalida = ""; // Contraseña del correo
 
     $mail = new PHPMailer(true);
